@@ -26,6 +26,19 @@ export default function AdminPage() {
     const [aiResponse, setAiResponse] = useState('');
     const [aiLoading, setAiLoading] = useState(false);
     const [aiError, setAiError] = useState('');
+    const [expandedJobs, setExpandedJobs] = useState<Set<string>>(new Set());
+
+    const toggleJobExpand = (jobId: string) => {
+        setExpandedJobs(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(jobId)) {
+                newSet.delete(jobId);
+            } else {
+                newSet.add(jobId);
+            }
+            return newSet;
+        });
+    };
 
     useEffect(() => {
         if (!loading && !user) {
@@ -319,7 +332,51 @@ export default function AdminPage() {
                                                                     </span>
                                                                 )}
                                                             </div>
-                                                            <p className="text-sm text-gray-400 mb-2 line-clamp-2">{job.description}</p>
+
+                                                            {/* Expandable Description */}
+                                                            <div className="mb-2">
+                                                                <p className={`text-sm text-gray-400 ${!expandedJobs.has(job.id!) ? 'line-clamp-2' : ''}`}>
+                                                                    {job.description}
+                                                                </p>
+                                                                {job.description && job.description.length > 150 && (
+                                                                    <button
+                                                                        onClick={() => toggleJobExpand(job.id!)}
+                                                                        className="mt-1 text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors"
+                                                                    >
+                                                                        {expandedJobs.has(job.id!) ? (
+                                                                            <>
+                                                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                                                                </svg>
+                                                                                Show less
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                                                </svg>
+                                                                                Show more
+                                                                            </>
+                                                                        )}
+                                                                    </button>
+                                                                )}
+                                                            </div>
+
+                                                            {/* Expanded Details Panel */}
+                                                            {expandedJobs.has(job.id!) && (
+                                                                <div className="mb-3 p-3 rounded-lg bg-white/5 border border-white/10 space-y-2">
+                                                                    {job.requirements && (
+                                                                        <div>
+                                                                            <h4 className="text-xs font-semibold text-white mb-1">Requirements</h4>
+                                                                            <p className="text-xs text-gray-400">{job.requirements}</p>
+                                                                        </div>
+                                                                    )}
+                                                                    <div>
+                                                                        <h4 className="text-xs font-semibold text-white mb-1">Posted By</h4>
+                                                                        <p className="text-xs text-gray-400">User ID: {job.userId}</p>
+                                                                    </div>
+                                                                </div>
+                                                            )}
                                                             <div className="flex flex-wrap gap-3 text-xs text-gray-400">
                                                                 <span className="flex items-center gap-1">
                                                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -403,9 +460,47 @@ export default function AdminPage() {
                                                                     </span>
                                                                 )}
                                                             </div>
-                                                            <div className="mb-4 text-sm text-gray-300 bg-white/5 p-3 rounded-lg">
-                                                                {job.description}
+
+                                                            {/* Expandable Description */}
+                                                            <div className="mb-4">
+                                                                <div className={`text-sm text-gray-300 bg-white/5 p-3 rounded-lg ${!expandedJobs.has(job.id!) ? 'line-clamp-3' : ''}`}>
+                                                                    {job.description}
+                                                                </div>
+                                                                <button
+                                                                    onClick={() => toggleJobExpand(job.id!)}
+                                                                    className="mt-2 text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors"
+                                                                >
+                                                                    {expandedJobs.has(job.id!) ? (
+                                                                        <>
+                                                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                                                            </svg>
+                                                                            Show less
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                                            </svg>
+                                                                            Show more
+                                                                        </>
+                                                                    )}
+                                                                </button>
                                                             </div>
+
+                                                            {/* Expanded Details Panel */}
+                                                            {expandedJobs.has(job.id!) && job.requirements && (
+                                                                <div className="mb-4 p-3 rounded-lg bg-white/5 border border-white/10 space-y-2">
+                                                                    <div>
+                                                                        <h4 className="text-sm font-semibold text-white mb-2">Requirements</h4>
+                                                                        <p className="text-sm text-gray-400">{job.requirements}</p>
+                                                                    </div>
+                                                                    <div>
+                                                                        <h4 className="text-sm font-semibold text-white mb-2">Posted By</h4>
+                                                                        <p className="text-sm text-gray-400">User ID: {job.userId}</p>
+                                                                    </div>
+                                                                </div>
+                                                            )}
 
                                                             <div className="grid grid-cols-2 gap-4 text-sm text-gray-400 mb-4">
                                                                 <div className="flex items-center gap-2">

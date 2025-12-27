@@ -189,6 +189,16 @@ export const updateJob = async (jobId: string, data: Partial<Job>) => {
     });
 };
 
+export const getJobById = async (jobId: string): Promise<Job | null> => {
+    const jobRef = doc(db, 'jobs', jobId);
+    const jobDoc = await getDoc(jobRef);
+
+    if (jobDoc.exists()) {
+        return { id: jobDoc.id, ...jobDoc.data() } as Job;
+    }
+    return null;
+};
+
 export const getPublicJobs = async (): Promise<Job[]> => {
     const jobsRef = collection(db, 'jobs');
     // Temporarily removed orderBy to avoid index requirement
@@ -197,6 +207,79 @@ export const getPublicJobs = async (): Promise<Job[]> => {
     const jobs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Job));
     // Sort in memory instead
     return jobs.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
+};
+
+// Worker Rating System
+export const incrementWorkerRating = async (workerId: string) => {
+    const workerRef = doc(db, 'workers', workerId);
+    const workerDoc = await getDoc(workerRef);
+
+    if (workerDoc.exists()) {
+        const currentRating = workerDoc.data().rating || 0;
+        await updateDoc(workerRef, {
+            rating: currentRating + 1,
+            updatedAt: Timestamp.now()
+        });
+    }
+};
+
+// Application Management
+export const getJobApplications = async (jobId: string) => {
+    const applicationsRef = collection(db, 'applications');
+    const q = query(applicationsRef, where('jobId', '==', jobId));
+    const snapshot = await getDocs(q);
+
+    // Fetch worker profiles for each application
+    const applications = await Promise.all(
+        snapshot.docs.map(async (appDoc) => {
+            const appData = appDoc.data();
+            const workerId = appData.workerId;
+
+            // Fetch worker profile
+            let workerProfile = null;
+            if (workerId) {
+                const workerRef = doc(db, 'workers', workerId);
+                const workerDoc = await getDoc(workerRef);
+                if (workerDoc.exists()) {
+                    workerProfile = workerDoc.data();
+                }
+            }
+
+            return {
+                id: appDoc.id,
+                ...appData,
+                workerProfile
+            };
+        })
+    );
+
+    return applications;
+};
+
+export const acceptApplication = async (applicationId: string) => {
+    const appRef = doc(db, 'applications', applicationId);
+    const appDoc = await getDoc(appRef);
+
+    if (appDoc.exists()) {
+        const workerId = appDoc.data().workerId;
+
+        // Update application status
+        await updateDoc(appRef, {
+            status: 'accepted',
+            acceptedAt: Timestamp.now()
+        });
+
+        // Auto-increment worker rating
+        await incrementWorkerRating(workerId);
+    }
+};
+
+export const rejectApplication = async (applicationId: string) => {
+    const appRef = doc(db, 'applications', applicationId);
+    await updateDoc(appRef, {
+        status: 'rejected',
+        rejectedAt: Timestamp.now()
+    });
 };
 
 export const deleteJob = async (jobId: string) => {
