@@ -88,9 +88,12 @@ export const updateUserProfile = async (uid: string, data: Partial<UserProfile>)
 
 export const getPendingUsers = async (): Promise<UserProfile[]> => {
     const usersRef = collection(db, 'users');
-    const q = query(usersRef, where('status', '==', 'pending'), orderBy('createdAt', 'desc'));
+    // Temporarily removed orderBy to avoid index requirement
+    const q = query(usersRef, where('status', '==', 'pending'));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => doc.data() as UserProfile);
+    const users = snapshot.docs.map(doc => doc.data() as UserProfile);
+    // Sort in memory instead
+    return users.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
 };
 
 export const approveUser = async (uid: string) => {
@@ -118,9 +121,12 @@ export const createJob = async (userId: string, jobData: Partial<Job>) => {
 
 export const getUserJobs = async (userId: string): Promise<Job[]> => {
     const jobsRef = collection(db, 'jobs');
-    const q = query(jobsRef, where('userId', '==', userId), orderBy('createdAt', 'desc'));
+    // Temporarily removed orderBy to avoid index requirement
+    const q = query(jobsRef, where('userId', '==', userId));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Job));
+    const jobs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Job));
+    // Sort in memory instead
+    return jobs.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
 };
 
 export const updateJob = async (jobId: string, data: Partial<Job>) => {
@@ -133,7 +139,10 @@ export const updateJob = async (jobId: string, data: Partial<Job>) => {
 
 export const getPublicJobs = async (): Promise<Job[]> => {
     const jobsRef = collection(db, 'jobs');
-    const q = query(jobsRef, where('isPublic', '==', true), orderBy('createdAt', 'desc'));
+    // Temporarily removed orderBy to avoid index requirement
+    const q = query(jobsRef, where('isPublic', '==', true));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Job));
+    const jobs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Job));
+    // Sort in memory instead
+    return jobs.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
 };

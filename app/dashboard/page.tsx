@@ -2,13 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../components/AuthProvider';
+import { useRouter } from 'next/navigation';
 import { getUserJobs, Job } from '../lib/db';
 import Link from 'next/link';
 
 export default function DashboardPage() {
-    const { profile } = useAuth();
+    const { profile, loading } = useAuth();
+    const router = useRouter();
     const [jobs, setJobs] = useState<Job[]>([]);
     const [loadingJobs, setLoadingJobs] = useState(true);
+
+    // Redirect admins to admin dashboard
+    useEffect(() => {
+        if (!loading && profile?.role === 'admin') {
+            router.push('/admin');
+        }
+    }, [profile, loading, router]);
 
     useEffect(() => {
         const fetchJobs = async () => {
@@ -20,6 +29,15 @@ export default function DashboardPage() {
         };
         fetchJobs();
     }, [profile]);
+
+    // Show loading while checking admin status
+    if (loading || profile?.role === 'admin') {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="spinner" />
+            </div>
+        );
+    }
 
     return (
         <div>
