@@ -9,7 +9,7 @@ import { logOut } from '../lib/firebase';
 import { analyzeLivelihood } from '../lib/gemini';
 import { westBengalStats, highRiskBlocks } from '../lib/wb-stats';
 
-type TabType = 'pending' | 'users' | 'jobs' | 'ai';
+type TabType = 'pending' | 'users' | 'jobs' | 'reviews' | 'ai';
 
 export default function AdminPage() {
     const { user, profile, loading } = useAuth();
@@ -18,6 +18,7 @@ export default function AdminPage() {
     const [pendingUsers, setPendingUsers] = useState<UserProfile[]>([]);
     const [approvedUsers, setApprovedUsers] = useState<UserProfile[]>([]);
     const [activeJobs, setActiveJobs] = useState<Job[]>([]);
+    const [pendingJobs, setPendingJobs] = useState<Job[]>([]);
     const [loadingData, setLoadingData] = useState(true);
     const [deleteJobConfirm, setDeleteJobConfirm] = useState<string | null>(null);
     // AI State
@@ -51,7 +52,9 @@ export default function AdminPage() {
             ]);
             setPendingUsers(pending);
             setApprovedUsers(approved);
-            setActiveJobs(jobs.filter(j => j.isPublic));
+            setActiveJobs(jobs.filter(j => j.status === 'approved' && j.isPublic));
+            // Include jobs with undefined status as pending to catch legacy data
+            setPendingJobs(jobs.filter(j => j.status === 'pending' || !j.status));
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
@@ -77,6 +80,28 @@ export default function AdminPage() {
         setDeleteJobConfirm(null);
     };
 
+    const handleJobReview = async (jobId: string, action: 'approve' | 'reject') => {
+        try {
+            // Import dynamically to avoid circular dependency issues if any, though db functions are safe
+            const { updateJob } = await import('../lib/db');
+
+            if (action === 'approve') {
+                await updateJob(jobId, { status: 'approved', isPublic: true });
+                // Move from pending to active/approved list
+                const job = pendingJobs.find(j => j.id === jobId);
+                if (job) {
+                    setPendingJobs(prev => prev.filter(j => j.id !== jobId));
+                    setActiveJobs(prev => [...prev, { ...job, status: 'approved', isPublic: true }]);
+                }
+            } else {
+                await updateJob(jobId, { status: 'rejected', isPublic: false });
+                setPendingJobs(prev => prev.filter(j => j.id !== jobId));
+            }
+        } catch (error) {
+            console.error('Error reviewing job:', error);
+        }
+    };
+
     const handleLogout = async () => {
         await logOut();
         router.push('/login');
@@ -94,6 +119,7 @@ export default function AdminPage() {
         { id: 'pending' as TabType, label: 'Pending Approvals', count: pendingUsers.length, color: 'amber' },
         { id: 'users' as TabType, label: 'Approved Users', count: approvedUsers.length, color: 'green' },
         { id: 'jobs' as TabType, label: 'Active Jobs', count: activeJobs.length, color: 'cyan' },
+        { id: 'reviews' as TabType, label: 'Job Reviews', count: pendingJobs.length, color: 'pink' },
         { id: 'ai' as TabType, label: 'AI Insights', count: null, color: 'purple' },
     ];
 
@@ -169,7 +195,8 @@ export default function AdminPage() {
                             {tab.count !== null && (
                                 <span className={`px-2 py-0.5 text-sm rounded-full ${tab.color === 'amber' ? 'bg-amber-500/20 text-amber-400' :
                                     tab.color === 'green' ? 'bg-green-500/20 text-green-400' :
-                                        tab.color === 'purple' ? 'bg-purple-500/20 text-purple-400' : 'bg-cyan-500/20 text-cyan-400'
+                                        tab.color === 'purple' ? 'bg-purple-500/20 text-purple-400' :
+                                            tab.color === 'pink' ? 'bg-pink-500/20 text-pink-400' : 'bg-cyan-500/20 text-cyan-400'
                                     }`}>
                                     {tab.count}
                                 </span>
@@ -351,6 +378,76 @@ export default function AdminPage() {
                                 </div>
                             )}
 
+                            {/* Job Reviews Tab */}
+                            {activeTab === 'reviews' && (
+                                <div>
+                                    <h2 className="text-xl font-semibold mb-6">Pending Job Reviews</h2>
+                                    {pendingJobs.length === 0 ? (
+                                        <div className="text-center py-12 text-gray-400">
+                                            <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <p>No jobs pending review</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            {pendingJobs.map((job) => (
+                                                <div key={job.id} className="glass-card p-6 border-l-4 border-l-pink-500">
+                                                    <div className="flex items-start justify-between gap-6">
+                                                        <div className="flex-1">
+                                                            <div className="flex items-center gap-3 mb-2">
+                                                                <h3 className="text-lg font-bold">{job.title}</h3>
+                                                                {job.jobType && (
+                                                                    <span className="px-2 py-0.5 text-xs rounded-full bg-cyan-500/20 text-cyan-400">
+                                                                        {job.jobType}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <div className="mb-4 text-sm text-gray-300 bg-white/5 p-3 rounded-lg">
+                                                                {job.description}
+                                                            </div>
+
+                                                            <div className="grid grid-cols-2 gap-4 text-sm text-gray-400 mb-4">
+                                                                <div className="flex items-center gap-2">
+                                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                                    </svg>
+                                                                    {job.location}
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                    </svg>
+                                                                    {job.salary || 'Not specified'}
+                                                                </div>
+                                                            </div>
+
+                                                            {/* User Info (Ideally fetch user details here but we can skip for now or show ID) */}
+                                                            {/* <div className="text-xs text-gray-500">Posted by User ID: {job.userId}</div> */}
+                                                        </div>
+
+                                                        <div className="flex flex-col gap-2 shrink-0">
+                                                            <button
+                                                                onClick={() => job.id && handleJobReview(job.id, 'approve')}
+                                                                className="btn-primary py-2 px-4 shadow-lg shadow-green-500/20 bg-gradient-to-r from-green-600 to-green-500 border-green-500"
+                                                            >
+                                                                Approve
+                                                            </button>
+                                                            <button
+                                                                onClick={() => job.id && handleJobReview(job.id, 'reject')}
+                                                                className="btn-secondary py-2 px-4 text-red-400 border-red-500/30 hover:bg-red-500/10"
+                                                            >
+                                                                Reject
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
                             {/* AI Insights Tab */}
                             {activeTab === 'ai' && (
                                 <div>
@@ -480,7 +577,7 @@ export default function AdminPage() {
                         </>
                     )}
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     );
 }

@@ -43,6 +43,7 @@ export interface Job {
     jobType: string; // Daily Wage, Contract, Permanent, Part-time, Seasonal
     isPublic: boolean;
     scheduledAt: Timestamp | null;
+    status: 'pending' | 'approved' | 'rejected';
     createdAt: Timestamp;
     updatedAt: Timestamp;
 }
@@ -154,6 +155,7 @@ export const createJob = async (userId: string, jobData: Partial<Job>) => {
         userId,
         isPublic: false,
         scheduledAt: null,
+        status: 'pending',
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
     };

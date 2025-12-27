@@ -135,8 +135,13 @@ export default function JobsPage() {
                                 <div className="flex-1">
                                     <div className="flex items-center gap-3 mb-2">
                                         <h3 className="text-xl font-semibold">{job.title}</h3>
-                                        <span className={`px-3 py-1 rounded-full text-xs ${job.isPublic ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
-                                            {job.isPublic ? 'Public' : 'Draft'}
+                                        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${job.status === 'approved'
+                                            ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                                            : job.status === 'rejected'
+                                                ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                                                : 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                                            }`}>
+                                            {job.status === 'approved' ? 'Active' : job.status === 'rejected' ? 'Rejected' : 'Under Review'}
                                         </span>
                                         {job.jobType && (
                                             <span className="px-3 py-1 rounded-full text-xs bg-cyan-500/20 text-cyan-400">
@@ -220,11 +225,18 @@ export default function JobsPage() {
                                     </button>
 
                                     {/* Toggle */}
-                                    <button
-                                        onClick={() => job.id && togglePublic(job.id, job.isPublic)}
-                                        className={`toggle ${job.isPublic ? 'active' : ''}`}
-                                        title={job.isPublic ? 'Make Private' : 'Make Public'}
-                                    />
+                                    <div className="relative group">
+                                        <button
+                                            onClick={() => job.status === 'approved' && job.id && togglePublic(job.id, job.isPublic)}
+                                            className={`toggle ${job.isPublic ? 'active' : ''} ${job.status !== 'approved' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            disabled={job.status !== 'approved'}
+                                        />
+                                        {job.status !== 'approved' && (
+                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs bg-black/80 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                                Wait for approval
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
