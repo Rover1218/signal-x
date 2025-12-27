@@ -21,6 +21,13 @@ export default function ProfileSetupPage() {
         if (!loading && !user) {
             router.push('/login');
         }
+
+        // Admins should go straight to admin dashboard
+        if (!loading && profile?.role === 'admin') {
+            router.push('/admin');
+            return;
+        }
+
         if (profile) {
             setDisplayName(profile.displayName || '');
             setCompany(profile.company || '');
@@ -32,6 +39,10 @@ export default function ProfileSetupPage() {
             // If already approved, go to dashboard
             if (profile.status === 'approved') {
                 router.push('/dashboard');
+            }
+            // If already pending, go to pending page
+            if (profile.status === 'pending') {
+                router.push('/pending');
             }
         }
     }, [user, profile, loading, router]);
@@ -61,7 +72,7 @@ export default function ProfileSetupPage() {
         }
     };
 
-    if (loading) {
+    if (loading || profile?.role === 'admin') {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="spinner" />

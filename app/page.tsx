@@ -17,6 +17,8 @@ export default function Home() {
         router.push('/dashboard');
       } else if (profile.status === 'pending') {
         router.push('/pending');
+      } else if (profile.status === 'incomplete') {
+        router.push('/profile-setup');
       } else {
         router.push('/profile-setup');
       }

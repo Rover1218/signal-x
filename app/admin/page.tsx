@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../components/AuthProvider';
-import { getPendingUsers, approveUser, rejectUser, UserProfile } from '../lib/db';
+import { getPendingUsers, getApprovedUsers, getAllJobs, approveUser, rejectUser, UserProfile, Job } from '../lib/db';
 import { logOut } from '../lib/firebase';
 import Link from 'next/link';
 
@@ -11,6 +11,8 @@ export default function AdminPage() {
     const { user, profile, loading } = useAuth();
     const router = useRouter();
     const [pendingUsers, setPendingUsers] = useState<UserProfile[]>([]);
+    const [approvedCount, setApprovedCount] = useState(0);
+    const [jobsCount, setJobsCount] = useState(0);
     const [loadingUsers, setLoadingUsers] = useState(true);
 
     useEffect(() => {
@@ -23,25 +25,33 @@ export default function AdminPage() {
     }, [user, profile, loading, router]);
 
     useEffect(() => {
-        const fetchPendingUsers = async () => {
-            try {
-                const users = await getPendingUsers();
-                setPendingUsers(users);
-            } catch (error) {
-                console.error('Error fetching pending users:', error);
-            } finally {
-                setLoadingUsers(false);
-            }
-        };
-
         if (profile?.role === 'admin') {
-            fetchPendingUsers();
+            refreshData();
         }
     }, [profile]);
+
+    const refreshData = async () => {
+        setLoadingUsers(true);
+        try {
+            const [pending, approved, jobs] = await Promise.all([
+                getPendingUsers(),
+                getApprovedUsers(),
+                getAllJobs()
+            ]);
+            setPendingUsers(pending);
+            setApprovedCount(approved.length);
+            setJobsCount(jobs.filter(j => j.isPublic).length);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        } finally {
+            setLoadingUsers(false);
+        }
+    };
 
     const handleApprove = async (uid: string) => {
         await approveUser(uid);
         setPendingUsers(prev => prev.filter(u => u.uid !== uid));
+        setApprovedCount(prev => prev + 1);
     };
 
     const handleReject = async (uid: string) => {
@@ -96,11 +106,11 @@ export default function AdminPage() {
                         <div className="text-gray-400">Pending Approvals</div>
                     </div>
                     <div className="stat-card">
-                        <div className="text-3xl font-bold text-green-400 mb-1">-</div>
+                        <div className="text-3xl font-bold text-green-400 mb-1">{approvedCount}</div>
                         <div className="text-gray-400">Approved Users</div>
                     </div>
                     <div className="stat-card">
-                        <div className="text-3xl font-bold text-cyan-400 mb-1">-</div>
+                        <div className="text-3xl font-bold text-cyan-400 mb-1">{jobsCount}</div>
                         <div className="text-gray-400">Active Jobs</div>
                     </div>
                     <div className="stat-card">
@@ -111,10 +121,22 @@ export default function AdminPage() {
 
                 {/* Pending Approvals */}
                 <div className="glass-card p-6">
-                    <h2 className="text-xl font-semibold mb-6 flex items-center gap-3">
-                        <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
-                        Pending Approvals
-                    </h2>
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-xl font-semibold flex items-center gap-3">
+                            <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+                            Pending Approvals
+                        </h2>
+                        <button
+                            onClick={refreshData}
+                            disabled={loadingUsers}
+                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all disabled:opacity-50"
+                            title="Refresh"
+                        >
+                            <svg className={`w-5 h-5 ${loadingUsers ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                    </div>
 
                     {loadingUsers ? (
                         <div className="flex justify-center py-12">

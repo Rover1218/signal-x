@@ -82,11 +82,8 @@ export default function PendingPage() {
                     </div>
                 </div>
 
-                <div className="flex gap-4">
-                    <Link href="/profile-setup" className="btn-secondary flex-1">
-                        Edit Profile
-                    </Link>
-                    <button onClick={handleLogout} className="btn-secondary flex-1 text-red-400 border-red-500/30 hover:bg-red-500/10">
+                <div className="flex justify-center">
+                    <button onClick={handleLogout} className="btn-secondary px-12 text-red-400 border-red-500/30 hover:bg-red-500/10">
                         Logout
                     </button>
                 </div>

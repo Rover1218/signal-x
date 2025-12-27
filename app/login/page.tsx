@@ -23,7 +23,7 @@ export default function LoginPage() {
             setError(error);
             setLoading(false);
         } else if (user) {
-            router.push('/profile-setup');
+            router.push('/redirect'); // Go to branded loading page
         }
     };
 
@@ -36,7 +36,7 @@ export default function LoginPage() {
             setError(error);
             setLoading(false);
         } else if (user) {
-            router.push('/profile-setup');
+            router.push('/redirect'); // Go to branded loading page
         }
     };
 

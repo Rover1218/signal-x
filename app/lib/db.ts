@@ -3,6 +3,7 @@ import {
     getDoc,
     setDoc,
     updateDoc,
+    deleteDoc,
     collection,
     query,
     where,
@@ -24,7 +25,7 @@ export interface UserProfile {
     phone: string;
     location: string;
     role: 'user' | 'admin';
-    status: 'pending' | 'approved' | 'rejected';
+    status: 'incomplete' | 'pending' | 'approved' | 'rejected';
     createdAt: Timestamp;
     updatedAt: Timestamp;
 }
@@ -38,11 +39,38 @@ export interface Job {
     location: string;
     salary: string;
     requirements: string;
+    skills: string[]; // Skills required for the job - used for AI matching
+    jobType: string; // Daily Wage, Contract, Permanent, Part-time, Seasonal
     isPublic: boolean;
     scheduledAt: Timestamp | null;
     createdAt: Timestamp;
     updatedAt: Timestamp;
 }
+
+// Available skills for job targeting (matches Flutter app)
+export const AVAILABLE_SKILLS = [
+    'Agriculture',
+    'Construction',
+    'Tailoring',
+    'Driving',
+    'Carpentry',
+    'Plumbing',
+    'Electrician',
+    'Weaving',
+    'Fishing',
+    'Masonry',
+    'Cooking',
+    'Security',
+];
+
+// Job types (matches Flutter app)
+export const JOB_TYPES = [
+    'Daily Wage',
+    'Contract',
+    'Permanent',
+    'Part-time',
+    'Seasonal',
+];
 
 // Admin email
 const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@signalx.com';
@@ -61,7 +89,7 @@ export const createUserProfile = async (uid: string, email: string, displayName:
         phone: '',
         location: '',
         role: isAdmin ? 'admin' : 'user',
-        status: isAdmin ? 'approved' : 'pending',
+        status: isAdmin ? 'approved' : 'incomplete', // Changed from 'pending' to 'incomplete'
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
     };
@@ -94,6 +122,20 @@ export const getPendingUsers = async (): Promise<UserProfile[]> => {
     const users = snapshot.docs.map(doc => doc.data() as UserProfile);
     // Sort in memory instead
     return users.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
+};
+
+export const getApprovedUsers = async (): Promise<UserProfile[]> => {
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('status', '==', 'approved'));
+    const snapshot = await getDocs(q);
+    // Filter out admin users - only count regular approved users
+    return snapshot.docs.map(doc => doc.data() as UserProfile).filter(u => u.role !== 'admin');
+};
+
+export const getAllJobs = async (): Promise<Job[]> => {
+    const jobsRef = collection(db, 'jobs');
+    const snapshot = await getDocs(jobsRef);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Job));
 };
 
 export const approveUser = async (uid: string) => {
@@ -145,4 +187,9 @@ export const getPublicJobs = async (): Promise<Job[]> => {
     const jobs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Job));
     // Sort in memory instead
     return jobs.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
+};
+
+export const deleteJob = async (jobId: string) => {
+    const jobRef = doc(db, 'jobs', jobId);
+    await deleteDoc(jobRef);
 };

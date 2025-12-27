@@ -1,14 +1,19 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../../../components/AuthProvider';
-import { createJob, AVAILABLE_SKILLS, JOB_TYPES } from '../../../lib/db';
-import { Timestamp } from 'firebase/firestore';
+import { useState, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import { useAuth } from '../../../../components/AuthProvider';
+import { updateJob, AVAILABLE_SKILLS, JOB_TYPES, Job } from '../../../../lib/db';
+import { doc, getDoc, Timestamp } from 'firebase/firestore';
+import { db } from '../../../../lib/firebase';
 
-export default function NewJobPage() {
+export default function EditJobPage() {
     const { profile } = useAuth();
     const router = useRouter();
+    const params = useParams();
+    const jobId = params.id as string;
+
+    const [loading, setLoading] = useState(true);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [location, setLocation] = useState('');
@@ -20,6 +25,37 @@ export default function NewJobPage() {
     const [scheduleTime, setScheduleTime] = useState('');
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        const fetchJob = async () => {
+            try {
+                const jobRef = doc(db, 'jobs', jobId);
+                const jobSnap = await getDoc(jobRef);
+                if (jobSnap.exists()) {
+                    const data = jobSnap.data() as Job;
+                    setTitle(data.title || '');
+                    setDescription(data.description || '');
+                    setLocation(data.location || '');
+                    setSalary(data.salary || '');
+                    setRequirements(data.requirements || '');
+                    setSelectedSkills(data.skills || []);
+                    setJobType(data.jobType || '');
+
+                    if (data.scheduledAt) {
+                        const date = data.scheduledAt.toDate();
+                        setScheduleDate(date.toISOString().split('T')[0]);
+                        setScheduleTime(date.toTimeString().slice(0, 5));
+                    }
+                }
+            } catch (err) {
+                setError('Failed to load job');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (jobId) fetchJob();
+    }, [jobId]);
 
     const toggleSkill = (skill: string) => {
         if (selectedSkills.includes(skill)) {
@@ -52,7 +88,7 @@ export default function NewJobPage() {
                 scheduledAt = Timestamp.fromDate(new Date(`${scheduleDate}T${scheduleTime}`));
             }
 
-            await createJob(profile.uid, {
+            await updateJob(jobId, {
                 title,
                 description,
                 location,
@@ -65,16 +101,29 @@ export default function NewJobPage() {
 
             router.push('/dashboard/jobs');
         } catch (err) {
-            setError('Failed to create job. Please try again.');
+            setError('Failed to update job. Please try again.');
             setSaving(false);
         }
     };
 
+    const clearSchedule = () => {
+        setScheduleDate('');
+        setScheduleTime('');
+    };
+
+    if (loading) {
+        return (
+            <div className="flex justify-center py-12">
+                <div className="spinner" />
+            </div>
+        );
+    }
+
     return (
         <div className="max-w-3xl">
             <div className="mb-10">
-                <h1 className="text-3xl font-bold mb-2">Post New Job</h1>
-                <p className="text-gray-400">Create a job and target workers by skills using AI matching</p>
+                <h1 className="text-3xl font-bold mb-2">Edit Job</h1>
+                <p className="text-gray-400">Update your job posting</p>
             </div>
 
             <div className="glass-card p-8">
@@ -135,15 +184,15 @@ export default function NewJobPage() {
                         </div>
                     </div>
 
-                    {/* Skills Selection - AI Targeting */}
+                    {/* Skills Selection */}
                     <div className="glass-card p-6">
                         <h3 className="font-semibold mb-2 flex items-center gap-2">
                             <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                             </svg>
-                            Target Skills (AI Matching) *
+                            Target Skills *
                         </h3>
-                        <p className="text-gray-400 text-sm mb-4">Select skills to match workers from the Flutter app</p>
+                        <p className="text-gray-400 text-sm mb-4">Select skills to match workers</p>
                         <div className="flex flex-wrap gap-2">
                             {AVAILABLE_SKILLS.map((skill) => (
                                 <button
@@ -151,25 +200,15 @@ export default function NewJobPage() {
                                     type="button"
                                     onClick={() => toggleSkill(skill)}
                                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedSkills.includes(skill)
-                                        ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white shadow-lg shadow-purple-500/30'
-                                        : 'bg-white/5 text-gray-400 border border-white/10 hover:border-purple-500/50 hover:text-white'
+                                            ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white shadow-lg'
+                                            : 'bg-white/5 text-gray-400 border border-white/10 hover:border-purple-500/50'
                                         }`}
                                 >
                                     {skill}
-                                    {selectedSkills.includes(skill) && (
-                                        <span className="ml-2">✓</span>
-                                    )}
+                                    {selectedSkills.includes(skill) && <span className="ml-2">✓</span>}
                                 </button>
                             ))}
                         </div>
-                        {selectedSkills.length > 0 && (
-                            <p className="text-green-400 text-sm mt-3 flex items-center gap-1">
-                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                {selectedSkills.length} skill{selectedSkills.length > 1 ? 's' : ''} selected
-                            </p>
-                        )}
                     </div>
 
                     {/* Job Type Selection */}
@@ -180,7 +219,6 @@ export default function NewJobPage() {
                             </svg>
                             Job Type *
                         </h3>
-                        <p className="text-gray-400 text-sm mb-4">What type of employment is this?</p>
                         <div className="flex flex-wrap gap-2">
                             {JOB_TYPES.map((type) => (
                                 <button
@@ -188,14 +226,12 @@ export default function NewJobPage() {
                                     type="button"
                                     onClick={() => setJobType(type)}
                                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${jobType === type
-                                        ? 'bg-gradient-to-r from-cyan-500 to-green-500 text-white shadow-lg shadow-cyan-500/30'
-                                        : 'bg-white/5 text-gray-400 border border-white/10 hover:border-cyan-500/50 hover:text-white'
+                                            ? 'bg-gradient-to-r from-cyan-500 to-green-500 text-white shadow-lg'
+                                            : 'bg-white/5 text-gray-400 border border-white/10 hover:border-cyan-500/50'
                                         }`}
                                 >
                                     {type}
-                                    {jobType === type && (
-                                        <span className="ml-2">✓</span>
-                                    )}
+                                    {jobType === type && <span className="ml-2">✓</span>}
                                 </button>
                             ))}
                         </div>
@@ -213,27 +249,23 @@ export default function NewJobPage() {
 
                     {/* Schedule Section */}
                     <div className="glass-card p-6">
-                        <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center justify-between mb-4">
                             <h3 className="font-semibold flex items-center gap-2">
                                 <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                Schedule Publication (Optional)
+                                Schedule Publication
                             </h3>
                             {(scheduleDate || scheduleTime) && (
                                 <button
                                     type="button"
-                                    onClick={() => { setScheduleDate(''); setScheduleTime(''); }}
-                                    className="text-sm text-red-400 hover:text-red-300 flex items-center gap-1"
+                                    onClick={clearSchedule}
+                                    className="text-sm text-red-400 hover:text-red-300"
                                 >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                    Clear
+                                    Clear Schedule
                                 </button>
                             )}
                         </div>
-                        <p className="text-gray-400 text-sm mb-4">Set when this job should go live automatically</p>
                         <div className="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">Date</label>
@@ -258,7 +290,7 @@ export default function NewJobPage() {
 
                     <div className="flex gap-4 pt-4">
                         <button type="submit" disabled={saving} className="btn-primary flex-1 justify-center">
-                            {saving ? <div className="spinner w-5 h-5" /> : 'Create Job'}
+                            {saving ? <div className="spinner w-5 h-5" /> : 'Save Changes'}
                         </button>
                         <button
                             type="button"
