@@ -24,7 +24,7 @@ export default function Home() {
   }, [user, profile, loading, router]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
+    <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-float" />
@@ -33,7 +33,7 @@ export default function Home() {
       </div>
 
       {/* Navigation */}
-      <nav className="relative z-10 container mx-auto px-6 py-6">
+      <nav className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 py-6">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
             <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30 animate-pulse-glow">
@@ -63,8 +63,8 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 container mx-auto px-6 pt-20 pb-32">
-        <div className="max-w-5xl mx-auto text-center">
+      <section className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-8 pt-24 pb-32">
+        <div className="w-full text-center">
           {/* Badge */}
           <div className="inline-flex items-center gap-3 glass-card px-6 py-3 mb-12 animate-fade-in">
             <span className="relative flex h-3 w-3">
@@ -132,7 +132,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="relative z-10 container mx-auto px-6 py-32">
+      <section id="features" className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 py-32">
         <div className="text-center mb-20">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             <span className="gradient-text">Features</span> <span className="text-white">Built for Impact</span>
@@ -142,7 +142,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
           {/* Feature 1 */}
           <div className="glass-card p-10 hover:border-purple-500/50 transition-all duration-300 group cursor-pointer">
             <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-800 rounded-3xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-lg shadow-purple-500/30">
@@ -212,7 +212,7 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="relative z-10 container mx-auto px-6 py-32">
+      <section id="how-it-works" className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-8 py-32">
         <div className="text-center mb-20">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             <span className="text-white">How </span><span className="gradient-text">SignalX</span><span className="text-white"> Works</span>
@@ -222,7 +222,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-12 w-full">
           <div className="text-center group">
             <div className="relative mb-8">
               <div className="w-24 h-24 bg-gradient-to-br from-purple-600 to-cyan-500 rounded-3xl flex items-center justify-center text-4xl font-bold mx-auto shadow-2xl shadow-purple-500/40 group-hover:scale-110 transition-transform">
@@ -263,8 +263,8 @@ export default function Home() {
       </section>
 
       {/* Impact Section */}
-      <section id="impact" className="relative z-10 container mx-auto px-6 py-32">
-        <div className="glass-card p-16 max-w-6xl mx-auto">
+      <section id="impact" className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-8 py-32">
+        <div className="glass-card p-8 sm:p-16 w-full mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               <span className="text-white">Our </span><span className="gradient-text">Impact</span>
@@ -294,8 +294,8 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative z-10 container mx-auto px-6 py-32">
-        <div className="glass-card p-16 max-w-5xl mx-auto text-center">
+      <section className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-8 py-32">
+        <div className="glass-card p-8 sm:p-16 w-full mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Ready to <span className="gradient-text">Transform Lives</span>?
           </h2>
@@ -314,8 +314,8 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-white/10 mt-20">
-        <div className="container mx-auto px-6 py-16">
+      <footer className="relative z-10 border-t border-white/10 mt-20 w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div>
               <div className="flex items-center gap-3 mb-6">
