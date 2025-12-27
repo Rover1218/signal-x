@@ -63,69 +63,68 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-8 pt-24 pb-32">
+      <section className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 pt-12 sm:pt-20 pb-20 sm:pb-32">
         <div className="w-full text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-3 glass-card px-6 py-3 mb-12 animate-fade-in">
+          <div className="inline-flex items-center gap-3 glass-card px-5 py-3 mb-8 sm:mb-12 hover:scale-105 transition-transform">
             <span className="relative flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
             </span>
-            <span className="text-sm md:text-base text-gray-200 font-semibold">Bengal's First AI-Powered Livelihood Platform</span>
+            <span className="text-xs sm:text-sm md:text-base text-gray-200 font-semibold">Bengal's First AI-Powered Livelihood Platform</span>
           </div>
 
           {/* Main Heading */}
-          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight">
-            <span className="gradient-text">Preventing Distress</span>
-            <br />
-            <span className="text-white">Migration Through AI</span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-6 sm:mb-8 leading-tight px-4">
+            <span className="gradient-text block mb-2">Preventing Distress</span>
+            <span className="text-white block">Migration Through AI</span>
           </h1>
 
           {/* Subheading */}
-          <p className="text-xl md:text-2xl text-gray-400 mb-14 max-w-4xl mx-auto leading-relaxed">
-            AI-powered local supply and demand intelligence system that predicts livelihood gaps
-            at block level and connects workers, MSMEs, cooperatives with government schemes
-            <span className="text-cyan-400 font-bold"> before income collapse happens</span>.
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-400 mb-10 sm:mb-14 max-w-4xl mx-auto leading-relaxed px-4">
+            AI-powered local supply and demand intelligence system that predicts{' '}
+            <span className="text-white font-semibold">livelihood gaps at block level</span> and connects workers, MSMEs, cooperatives with government schemes{' '}
+            <span className="text-cyan-400 font-bold">before income collapse happens</span>.
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-20">
-            <Link href="/signup" className="btn-primary text-lg px-12 py-5 group">
-              <svg className="w-6 h-6 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center mb-16 sm:mb-20 px-4">
+            <Link href="/signup" className="btn-primary text-base sm:text-lg px-10 sm:px-12 py-4 sm:py-5 group shadow-2xl shadow-purple-600/30 hover:shadow-purple-600/50">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
               Start Free Today
             </Link>
-            <Link href="/login" className="btn-secondary text-lg px-12 py-5">
+            <Link href="/login" className="btn-secondary text-base sm:text-lg px-10 sm:px-12 py-4 sm:py-5 shadow-xl hover:shadow-2xl">
               Recruiter Login
             </Link>
           </div>
 
           {/* Trust Indicators */}
-          <div className="flex flex-wrap items-center justify-center gap-8 text-gray-500">
-            <div className="flex items-center gap-3 group">
-              <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-gray-500 px-4">
+            <div className="flex items-center gap-2 sm:gap-3 group cursor-pointer">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-green-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
               </div>
-              <span className="font-medium text-gray-400">Powered by Google Gemini AI</span>
+              <span className="text-sm sm:text-base font-medium text-gray-400">Powered by Gemini AI</span>
             </div>
-            <div className="flex items-center gap-3 group">
-              <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+            <div className="flex items-center gap-2 sm:gap-3 group cursor-pointer">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-green-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
               </div>
-              <span className="font-medium text-gray-400">341 Blocks Covered</span>
+              <span className="text-sm sm:text-base font-medium text-gray-400">341 Blocks Covered</span>
             </div>
-            <div className="flex items-center gap-3 group">
-              <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+            <div className="flex items-center gap-2 sm:gap-3 group cursor-pointer">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-green-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
               </div>
-              <span className="font-medium text-gray-400">100% Free for Workers</span>
+              <span className="text-sm sm:text-base font-medium text-gray-400">100% Free for Workers</span>
             </div>
           </div>
         </div>
