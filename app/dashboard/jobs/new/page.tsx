@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../components/AuthProvider';
 import { createJob, AVAILABLE_SKILLS, JOB_TYPES } from '../../../lib/db';
+import { checkJobSafety } from '../../../lib/moderation';
 import { Timestamp } from 'firebase/firestore';
 
 export default function NewJobPage() {
@@ -52,6 +53,17 @@ export default function NewJobPage() {
                 scheduledAt = Timestamp.fromDate(new Date(`${scheduleDate}T${scheduleTime}`));
             }
 
+            // AI Moderation Check
+            const moderation = await checkJobSafety(title, description);
+
+            let status: 'pending' | 'approved' | 'rejected' = 'pending';
+            let isPublic = false;
+
+            if (moderation.isSafe) {
+                status = 'approved';
+                isPublic = true;
+            }
+
             await createJob(profile.uid, {
                 title,
                 description,
@@ -60,10 +72,15 @@ export default function NewJobPage() {
                 requirements,
                 skills: selectedSkills,
                 jobType,
-                scheduledAt
+                scheduledAt,
+                status: status,
+                isPublic: isPublic,
+                moderationStatus: moderation.isSafe ? 'auto-approved' : 'flagged',
+                moderationReason: moderation.reason || ''
             });
 
-            router.push('/dashboard/jobs');
+            const redirectUrl = moderation.isSafe ? '/dashboard/jobs' : '/dashboard/jobs?moderation=flagged';
+            router.push(redirectUrl);
         } catch (err) {
             setError('Failed to create job. Please try again.');
             setSaving(false);

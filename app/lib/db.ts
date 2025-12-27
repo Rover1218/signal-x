@@ -42,6 +42,8 @@ export interface Job {
     skills: string[]; // Skills required for the job - used for AI matching
     jobType: string; // Daily Wage, Contract, Permanent, Part-time, Seasonal
     isPublic: boolean;
+    moderationStatus?: 'auto-approved' | 'flagged' | 'manual' | 'rejected';
+    moderationReason?: string;
     scheduledAt: Timestamp | null;
     status: 'pending' | 'approved' | 'rejected';
     createdAt: Timestamp;
@@ -149,10 +151,16 @@ export const rejectUser = async (uid: string) => {
 
 // Job functions
 export const createJob = async (userId: string, jobData: Partial<Job>) => {
+    // Fetch user profile from users collection to get employer name
+    const userProfile = await getUserProfile(userId);
+
     const jobsRef = collection(db, 'jobs');
     const job = {
         ...jobData,
         userId,
+        employerName: userProfile?.displayName || userProfile?.company || 'Unknown Employer',
+        employerPhoto: userProfile?.photoURL || '',
+        recruiterId: userId,
         isPublic: false,
         scheduledAt: null,
         status: 'pending',
