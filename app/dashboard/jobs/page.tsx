@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../../components/AuthProvider';
-import { getUserJobs, updateJob, deleteJob, Job } from '../../lib/db';
+import { getUserJobs, updateJob, deleteJob, Job, getJobApplicationCount } from '../../lib/db';
 import { Timestamp } from 'firebase/firestore';
 
 export default function JobsPage() {
@@ -14,6 +14,7 @@ export default function JobsPage() {
     const [scheduleDate, setScheduleDate] = useState('');
     const [scheduleTime, setScheduleTime] = useState('');
     const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+    const [applicationCounts, setApplicationCounts] = useState<Record<string, number>>({});
 
     useEffect(() => {
         if (profile?.uid) {
@@ -29,6 +30,15 @@ export default function JobsPage() {
             // Show jobs immediately
             setJobs(userJobs);
             setLoading(false);
+
+            // Fetch application counts
+            const counts: Record<string, number> = {};
+            await Promise.all(userJobs.map(async (job) => {
+                if (job.id) {
+                    counts[job.id] = await getJobApplicationCount(job.id);
+                }
+            }));
+            setApplicationCounts(counts);
 
             // Auto-publish jobs in background (parallelize)
             const now = new Date();
@@ -191,6 +201,25 @@ export default function JobsPage() {
 
                                 {/* Actions */}
                                 <div className="flex items-center gap-3">
+                                    {/* View Applications */}
+                                    <Link
+                                        href={`/dashboard/jobs/${job.id}/applications`}
+                                        className={`relative p-2 rounded-lg transition-all ${(applicationCounts[job.id!] || 0) > 0
+                                                ? 'bg-purple-500/20 text-purple-400 hover:bg-purple-500/30'
+                                                : 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white'
+                                            }`}
+                                        title="View Applications"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                        </svg>
+                                        {(applicationCounts[job.id!] || 0) > 0 && (
+                                            <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-purple-500 text-white text-xs flex items-center justify-center font-bold">
+                                                {applicationCounts[job.id!]}
+                                            </span>
+                                        )}
+                                    </Link>
+
                                     {/* Edit */}
                                     <Link
                                         href={`/dashboard/jobs/${job.id}/edit`}

@@ -282,6 +282,13 @@ export const rejectApplication = async (applicationId: string) => {
     });
 };
 
+export const getJobApplicationCount = async (jobId: string): Promise<number> => {
+    const applicationsRef = collection(db, 'applications');
+    const q = query(applicationsRef, where('jobId', '==', jobId));
+    const snapshot = await getDocs(q);
+    return snapshot.size;
+};
+
 export const deleteJob = async (jobId: string) => {
     const jobRef = doc(db, 'jobs', jobId);
     await deleteDoc(jobRef);
