@@ -2,11 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
 import { useAuth } from '../components/AuthProvider';
 import { getPendingUsers, getApprovedUsers, getAllJobs, approveUser, rejectUser, deleteJob, UserProfile, Job } from '../lib/db';
 import { logOut } from '../lib/firebase';
+import { analyzeLivelihood } from '../lib/gemini';
+import { westBengalStats, highRiskBlocks } from '../lib/wb-stats';
 
-type TabType = 'pending' | 'users' | 'jobs';
+type TabType = 'pending' | 'users' | 'jobs' | 'ai';
 
 export default function AdminPage() {
     const { user, profile, loading } = useAuth();
@@ -17,6 +20,11 @@ export default function AdminPage() {
     const [activeJobs, setActiveJobs] = useState<Job[]>([]);
     const [loadingData, setLoadingData] = useState(true);
     const [deleteJobConfirm, setDeleteJobConfirm] = useState<string | null>(null);
+    // AI State
+    const [aiQuery, setAiQuery] = useState('');
+    const [aiResponse, setAiResponse] = useState('');
+    const [aiLoading, setAiLoading] = useState(false);
+    const [aiError, setAiError] = useState('');
 
     useEffect(() => {
         if (!loading && !user) {
@@ -86,7 +94,23 @@ export default function AdminPage() {
         { id: 'pending' as TabType, label: 'Pending Approvals', count: pendingUsers.length, color: 'amber' },
         { id: 'users' as TabType, label: 'Approved Users', count: approvedUsers.length, color: 'green' },
         { id: 'jobs' as TabType, label: 'Active Jobs', count: activeJobs.length, color: 'cyan' },
+        { id: 'ai' as TabType, label: 'AI Insights', count: null, color: 'purple' },
     ];
+
+    const handleAiAnalyze = async () => {
+        if (!aiQuery.trim()) return;
+        setAiLoading(true);
+        setAiError('');
+        setAiResponse('');
+        try {
+            const result = await analyzeLivelihood(aiQuery);
+            setAiResponse(result);
+        } catch (err) {
+            setAiError(err instanceof Error ? err.message : 'Failed to analyze');
+        } finally {
+            setAiLoading(false);
+        }
+    };
 
     return (
         <div className="min-h-screen">
@@ -133,19 +157,26 @@ export default function AdminPage() {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex items-center gap-3 px-5 py-3 rounded-xl font-medium transition-all whitespace-nowrap ${activeTab === tab.id
-                                    ? 'bg-gradient-to-r from-purple-600/20 to-cyan-500/20 border border-purple-500/30 text-white'
-                                    : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
+                                ? 'bg-gradient-to-r from-purple-600/20 to-cyan-500/20 border border-purple-500/30 text-white'
+                                : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
                                 }`}
                         >
                             <span className={`w-2 h-2 rounded-full ${tab.color === 'amber' ? 'bg-amber-400' :
-                                    tab.color === 'green' ? 'bg-green-400' : 'bg-cyan-400'
+                                tab.color === 'green' ? 'bg-green-400' :
+                                    tab.color === 'purple' ? 'bg-purple-400' : 'bg-cyan-400'
                                 }`} />
                             {tab.label}
-                            <span className={`px-2 py-0.5 text-sm rounded-full ${tab.color === 'amber' ? 'bg-amber-500/20 text-amber-400' :
-                                    tab.color === 'green' ? 'bg-green-500/20 text-green-400' : 'bg-cyan-500/20 text-cyan-400'
-                                }`}>
-                                {tab.count}
-                            </span>
+                            {tab.count !== null && (
+                                <span className={`px-2 py-0.5 text-sm rounded-full ${tab.color === 'amber' ? 'bg-amber-500/20 text-amber-400' :
+                                    tab.color === 'green' ? 'bg-green-500/20 text-green-400' :
+                                        tab.color === 'purple' ? 'bg-purple-500/20 text-purple-400' : 'bg-cyan-500/20 text-cyan-400'
+                                    }`}>
+                                    {tab.count}
+                                </span>
+                            )}
+                            {tab.id === 'ai' && (
+                                <span className="px-2 py-0.5 text-xs rounded-full bg-gradient-to-r from-purple-500/20 to-cyan-500/20 text-purple-300">Groq</span>
+                            )}
                         </button>
                     ))}
                 </div>
@@ -317,6 +348,133 @@ export default function AdminPage() {
                                             ))}
                                         </div>
                                     )}
+                                </div>
+                            )}
+
+                            {/* AI Insights Tab */}
+                            {activeTab === 'ai' && (
+                                <div>
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h2 className="text-xl font-semibold">AI Insights & Trends</h2>
+                                        <span className="px-3 py-1 text-xs rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                                            Powered by Groq Llama3
+                                        </span>
+                                    </div>
+
+                                    {/* Stats Overview */}
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                                        <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                                            <div className="text-xs text-gray-400 mb-1">Active Workers</div>
+                                            <div className="text-xl font-bold text-green-400">{(westBengalStats.mgnrega.activeWorkers / 1000000).toFixed(1)}M</div>
+                                        </div>
+                                        <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                                            <div className="text-xs text-gray-400 mb-1">Migrant Est.</div>
+                                            <div className="text-xl font-bold text-amber-400">{(westBengalStats.migration.estimatedMigrants / 10).toFixed(1)}M</div>
+                                        </div>
+                                        <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                                            <div className="text-xs text-gray-400 mb-1">High Risk Dists.</div>
+                                            <div className="text-xl font-bold text-red-400">{westBengalStats.migration.highRiskDistricts.length}</div>
+                                        </div>
+                                        <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                                            <div className="text-xs text-gray-400 mb-1">Daily Avg Wage</div>
+                                            <div className="text-xl font-bold text-cyan-400">₹{westBengalStats.mgnrega.averageWage}</div>
+                                        </div>
+                                    </div>
+
+                                    {/* Quick Info Grid */}
+                                    <div className="grid md:grid-cols-2 gap-6 mb-8">
+                                        <div className="space-y-4">
+                                            <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider">High Risk Blocks</h3>
+                                            <div className="grid grid-cols-1 gap-2">
+                                                {highRiskBlocks.slice(0, 3).map(item => (
+                                                    <div key={item.district} className="p-3 rounded-lg bg-red-500/5 border border-red-500/10">
+                                                        <div className="text-xs font-semibold text-red-400 mb-1">{item.district}</div>
+                                                        <div className="text-[10px] text-gray-500 truncate">
+                                                            {item.blocks.join(', ')}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider">Migration Hotspots</h3>
+                                            <div className="flex flex-wrap gap-2">
+                                                {westBengalStats.migration.topDestinations.map(dest => (
+                                                    <span key={dest} className="px-3 py-1.5 text-xs rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                        {dest}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* AI Query Box */}
+                                    <div className="p-6 rounded-2xl bg-gradient-to-br from-purple-600/10 to-cyan-500/10 border border-purple-500/20 mb-6">
+                                        <div className="flex gap-4">
+                                            <input
+                                                type="text"
+                                                value={aiQuery}
+                                                onChange={(e) => setAiQuery(e.target.value)}
+                                                className="input flex-1 bg-black/20 border-white/10 focus:border-purple-500/50"
+                                                placeholder="Ask about migration trends, livelihood gaps, or scheme impact..."
+                                                onKeyDown={(e) => e.key === 'Enter' && handleAiAnalyze()}
+                                            />
+                                            <button
+                                                onClick={handleAiAnalyze}
+                                                disabled={aiLoading}
+                                                className="btn-primary px-8"
+                                            >
+                                                {aiLoading ? <div className="spinner w-5 h-5" /> : 'Analyze'}
+                                            </button>
+                                        </div>
+                                        {aiError && (
+                                            <p className="text-red-400 text-sm mt-3 flex items-center gap-2">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                {aiError}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {/* Response Display */}
+                                    {aiResponse && (
+                                        <div className="glass-card p-6 border-green-500/20 bg-green-500/5 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                            <div className="flex items-center gap-2 mb-4 text-green-400">
+                                                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                                                <span className="text-sm font-semibold">SignalX Analysis Complete</span>
+                                            </div>
+                                            <div className="prose prose-invert prose-sm max-w-none prose-headings:text-purple-400 prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-p:text-gray-300 prose-p:leading-relaxed prose-strong:text-cyan-400 prose-strong:font-semibold prose-li:text-gray-300 prose-ul:my-2 prose-ol:my-2">
+                                                <ReactMarkdown>{aiResponse}</ReactMarkdown>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Quick Queries */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-sm font-medium text-gray-400">Suggested Inquiries</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {[
+                                                'Analyze migration patterns in Purulia vs Bankura',
+                                                'Impact of seasonal migration on Sundarbans economy',
+                                                'Effectiveness of MGNREGA in reducing distress migration',
+                                                'Skill gaps in high-risk migration blocks',
+                                                'Alternative livelihood opportunities in Murshidabad'
+                                            ].map((preset) => (
+                                                <button
+                                                    key={preset}
+                                                    onClick={() => {
+                                                        setAiQuery(preset);
+                                                        // Auto-trigger analysis for quick queries? 
+                                                        // Let's just set the query for now as per dashboard behavior
+                                                    }}
+                                                    className="px-4 py-2 text-xs rounded-xl bg-white/5 border border-white/10 hover:border-purple-500/50 hover:bg-white/10 transition-all text-gray-400 hover:text-white"
+                                                >
+                                                    {preset}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </>
