@@ -9,7 +9,7 @@ import { logOut } from '../lib/firebase';
 import { analyzeLivelihood } from '../lib/gemini';
 import { westBengalStats, highRiskBlocks } from '../lib/wb-stats';
 
-type TabType = 'pending' | 'users' | 'jobs' | 'reviews' | 'ai';
+type TabType = 'pending' | 'users' | 'jobs' | 'reviews' | 'ai' | 'alerts';
 
 export default function AdminPage() {
     const { user, profile, loading } = useAuth();
@@ -27,6 +27,9 @@ export default function AdminPage() {
     const [aiLoading, setAiLoading] = useState(false);
     const [aiError, setAiError] = useState('');
     const [expandedJobs, setExpandedJobs] = useState<Set<string>>(new Set());
+    // Alerts State
+    const [alertsLoading, setAlertsLoading] = useState(false);
+    const [alertResults, setAlertResults] = useState<any[]>([]);
 
     const toggleJobExpand = (jobId: string) => {
         setExpandedJobs(prev => {
@@ -134,6 +137,7 @@ export default function AdminPage() {
         { id: 'jobs' as TabType, label: 'Active Jobs', count: activeJobs.length, color: 'cyan' },
         { id: 'reviews' as TabType, label: 'Job Reviews', count: pendingJobs.length, color: 'pink' },
         { id: 'ai' as TabType, label: 'AI Insights', count: null, color: 'purple' },
+        { id: 'alerts' as TabType, label: 'Supply Alerts', count: null, color: 'red' },
     ];
 
     const handleAiAnalyze = async () => {
@@ -202,14 +206,16 @@ export default function AdminPage() {
                         >
                             <span className={`w-2 h-2 rounded-full ${tab.color === 'amber' ? 'bg-amber-400' :
                                 tab.color === 'green' ? 'bg-green-400' :
-                                    tab.color === 'purple' ? 'bg-purple-400' : 'bg-cyan-400'
+                                    tab.color === 'purple' ? 'bg-purple-400' :
+                                        tab.color === 'red' ? 'bg-red-400' : 'bg-cyan-400'
                                 }`} />
                             {tab.label}
                             {tab.count !== null && (
                                 <span className={`px-2 py-0.5 text-sm rounded-full ${tab.color === 'amber' ? 'bg-amber-500/20 text-amber-400' :
                                     tab.color === 'green' ? 'bg-green-500/20 text-green-400' :
                                         tab.color === 'purple' ? 'bg-purple-500/20 text-purple-400' :
-                                            tab.color === 'pink' ? 'bg-pink-500/20 text-pink-400' : 'bg-cyan-500/20 text-cyan-400'
+                                            tab.color === 'pink' ? 'bg-pink-500/20 text-pink-400' :
+                                                tab.color === 'red' ? 'bg-red-500/20 text-red-400' : 'bg-cyan-500/20 text-cyan-400'
                                     }`}>
                                     {tab.count}
                                 </span>
@@ -666,6 +672,129 @@ export default function AdminPage() {
                                                 </button>
                                             ))}
                                         </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Supply-Demand Alerts Tab */}
+                            {activeTab === 'alerts' && (
+                                <div>
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h2 className="text-xl font-semibold">Supply-Demand Alerts</h2>
+                                        <button
+                                            onClick={async () => {
+                                                setAlertsLoading(true);
+                                                setAlertResults([]);
+                                                const districts = ['Kolkata', 'Purulia', 'Bankura', 'Murshidabad', 'Malda', 'South 24 Parganas', 'North 24 Parganas'];
+                                                const validReports = [];
+
+                                                for (const district of districts) {
+                                                    try {
+                                                        // Call with dryRun: true to get data without sending individual email
+                                                        const res = await fetch('/api/admin/check-supply-demand', {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({ districtName: district, dryRun: true }),
+                                                        });
+                                                        const responseData = await res.json();
+
+                                                        if (responseData.success && responseData.data) {
+                                                            const report = responseData.data;
+                                                            setAlertResults(prev => [...prev, { district, ...report }]);
+
+                                                            // Collect for bulk email if risk is medium+ or critical (or send all for complete report)
+                                                            // Sending all for the summary report
+                                                            validReports.push(report);
+                                                        }
+                                                    } catch (error) {
+                                                        console.error(`Failed to check ${district}`, error);
+                                                        setAlertResults(prev => [...prev, { district, error: true }]);
+                                                    }
+                                                }
+
+                                                // Send single bulk email if we have reports
+                                                if (validReports.length > 0) {
+                                                    try {
+                                                        await fetch('/api/admin/send-bulk-alert', {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({ reports: validReports }),
+                                                        });
+                                                        alert(`Analysis complete. Sent 1 summary email for ${validReports.length} districts.`);
+                                                    } catch (e) {
+                                                        console.error('Failed to send bulk email', e);
+                                                        alert('Analysis complete, but failed to send summary email.');
+                                                    }
+                                                }
+
+                                                setAlertsLoading(false);
+                                            }}
+                                            disabled={alertsLoading}
+                                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                                        >
+                                            {alertsLoading ? 'Analyzing...' : '🚨 Check All Districts'}
+                                        </button>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        {alertsLoading && (
+                                            <div className="text-center py-12">
+                                                <div className="spinner mx-auto mb-4" />
+                                                <p className="text-gray-400">Analyzing supply-demand ratios...</p>
+                                            </div>
+                                        )}
+
+                                        {alertResults.length > 0 && (
+                                            <div className="grid gap-4">
+                                                {alertResults.map((result, idx) => (
+                                                    <div key={idx} className={`glass-card p-4 border-l-4 ${result.error ? 'border-gray-500' :
+                                                        result.riskLevel === 'critical' ? 'border-red-500' :
+                                                            result.riskLevel === 'high' ? 'border-orange-500' :
+                                                                result.riskLevel === 'medium' ? 'border-yellow-500' :
+                                                                    'border-green-500'
+                                                        }`}>
+                                                        <div className="flex items-center justify-between">
+                                                            <div>
+                                                                <h3 className="font-semibold text-lg">{result.district}</h3>
+                                                                {result.error ? (
+                                                                    <p className="text-gray-400 text-sm">Error checking district</p>
+                                                                ) : (
+                                                                    <>
+                                                                        <p className={`text-sm font-medium ${result.riskLevel === 'critical' ? 'text-red-400' :
+                                                                            result.riskLevel === 'high' ? 'text-orange-400' :
+                                                                                result.riskLevel === 'medium' ? 'text-yellow-400' :
+                                                                                    'text-green-400'
+                                                                            }`}>
+                                                                            {result.riskLevel?.toUpperCase() || 'LOW'} RISK - Ratio: {result.ratio || 'N/A'}
+                                                                        </p>
+                                                                        <p className="text-gray-400 text-xs mt-1">
+                                                                            {result.message || result.success ? '✅ Alert sent to admin' : 'ℹ️ No alert needed'}
+                                                                        </p>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                            {!result.error && result.riskLevel && ['critical', 'high', 'medium'].includes(result.riskLevel) && (
+                                                                <div className="text-right">
+                                                                    <span className="text-2xl">
+                                                                        {result.riskLevel === 'critical' ? '🚨' : result.riskLevel === 'high' ? '⚠️' : '⚡'}
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {!alertsLoading && alertResults.length === 0 && (
+                                            <div className="text-center py-12 text-gray-400">
+                                                <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                                <p>Click "Check All Districts" to monitor supply-demand ratios</p>
+                                                <p className="text-sm mt-2">System will automatically send email alerts for high-risk areas</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             )}

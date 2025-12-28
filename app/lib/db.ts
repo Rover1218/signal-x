@@ -8,7 +8,6 @@ import {
     query,
     where,
     getDocs,
-    orderBy,
     Timestamp,
     addDoc
 } from 'firebase/firestore';
@@ -261,7 +260,9 @@ export const acceptApplication = async (applicationId: string) => {
     const appDoc = await getDoc(appRef);
 
     if (appDoc.exists()) {
-        const workerId = appDoc.data().workerId;
+        const appData = appDoc.data();
+        const workerId = appData.workerId;
+        const jobId = appData.jobId;
 
         // Update application status
         await updateDoc(appRef, {
@@ -271,15 +272,52 @@ export const acceptApplication = async (applicationId: string) => {
 
         // Auto-increment worker rating
         await incrementWorkerRating(workerId);
+
+        // Send email notification via API (server-side)
+        try {
+            await fetch('/api/applications/send-status-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    applicationId,
+                    status: 'accepted'
+                }),
+            });
+        } catch (emailError) {
+            console.error('Failed to trigger acceptance email:', emailError);
+        }
     }
 };
 
 export const rejectApplication = async (applicationId: string) => {
     const appRef = doc(db, 'applications', applicationId);
-    await updateDoc(appRef, {
-        status: 'rejected',
-        rejectedAt: Timestamp.now()
-    });
+    const appDoc = await getDoc(appRef);
+
+    if (appDoc.exists()) {
+        const appData = appDoc.data();
+        const workerId = appData.workerId;
+        const jobId = appData.jobId;
+
+        // Update status
+        await updateDoc(appRef, {
+            status: 'rejected',
+            rejectedAt: Timestamp.now()
+        });
+
+        // Send email notification via API (server-side)
+        try {
+            await fetch('/api/applications/send-status-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    applicationId,
+                    status: 'rejected'
+                }),
+            });
+        } catch (emailError) {
+            console.error('Failed to trigger rejection email:', emailError);
+        }
+    }
 };
 
 export const getJobApplicationCount = async (jobId: string): Promise<number> => {
