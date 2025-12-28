@@ -48,10 +48,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* Sidebar */}
             <aside className={`sidebar w-64 min-h-screen p-6 ${sidebarOpen ? '' : 'hidden'}`}>
                 <div className="flex items-center gap-3 mb-10">
-                    <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-cyan-500 rounded-xl flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#1e3a5f' }}>
                         <span className="text-white font-bold text-lg">S</span>
                     </div>
-                    <span className="text-xl font-bold gradient-text">SignalX</span>
+                    <span className="text-xl font-bold text-emerald-500">SignalX</span>
                 </div>
 
                 <nav className="space-y-2">
@@ -96,7 +96,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         {profile.photoURL ? (
                             <img src={profile.photoURL} alt="" className="w-10 h-10 rounded-full object-cover" />
                         ) : (
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: '#1e3a5f' }}>
                                 <span className="font-bold text-white">{profile.displayName?.[0]?.toUpperCase()}</span>
                             </div>
                         )}

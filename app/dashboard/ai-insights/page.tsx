@@ -109,11 +109,11 @@ export default function AIInsightsPage() {
                         <div className="text-xs text-gray-400">Job Cards</div>
                     </div>
                     <div className="text-center p-3 rounded-lg bg-white/5">
-                        <div className="text-2xl font-bold text-cyan-400">{formatNumber(westBengalStats.mgnrega.activeWorkers)}</div>
+                        <div className="text-2xl font-bold text-teal-400">{formatNumber(westBengalStats.mgnrega.activeWorkers)}</div>
                         <div className="text-xs text-gray-400">Active Workers</div>
                     </div>
                     <div className="text-center p-3 rounded-lg bg-white/5">
-                        <div className="text-2xl font-bold text-purple-400">{westBengalStats.mgnrega.personDaysGenerated} L</div>
+                        <div className="text-2xl font-bold text-teal-400">{westBengalStats.mgnrega.personDaysGenerated} L</div>
                         <div className="text-xs text-gray-400">Person-Days Generated</div>
                     </div>
                     <div className="text-center p-3 rounded-lg bg-white/5">
@@ -131,28 +131,28 @@ export default function AIInsightsPage() {
             <div className="glass-card p-5 mb-6">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="font-semibold flex items-center gap-2">
-                        <span className="w-2 h-2 bg-purple-400 rounded-full" />
+                        <span className="w-2 h-2 bg-teal-400 rounded-full" />
                         State Scheme Coverage
                     </h2>
                     <span className="text-xs text-gray-500">Source: wb.gov.in</span>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="p-4 rounded-lg bg-gradient-to-br from-pink-500/10 to-purple-500/10 border border-pink-500/20">
-                        <div className="text-2xl font-bold text-pink-400">{formatNumber(westBengalStats.schemes.lakshirBhandar.beneficiaries)}</div>
+                    <div className="p-4 rounded-lg border" style={{ background: 'rgba(30, 58, 95, 0.15)', borderColor: 'rgba(30, 58, 95, 0.3)' }}>
+                        <div className="text-2xl font-bold text-teal-400">{formatNumber(westBengalStats.schemes.lakshirBhandar.beneficiaries)}</div>
                         <div className="text-sm text-gray-300">Lakshmir Bhandar</div>
                         <div className="text-xs text-gray-500">Women Beneficiaries</div>
                     </div>
-                    <div className="p-4 rounded-lg bg-gradient-to-br from-green-500/10 to-cyan-500/10 border border-green-500/20">
-                        <div className="text-2xl font-bold text-green-400">{formatNumber(westBengalStats.schemes.krishakBandhu.beneficiaries)}</div>
+                    <div className="p-4 rounded-lg border" style={{ background: 'rgba(16, 185, 129, 0.1)', borderColor: 'rgba(16, 185, 129, 0.25)' }}>
+                        <div className="text-2xl font-bold text-emerald-400">{formatNumber(westBengalStats.schemes.krishakBandhu.beneficiaries)}</div>
                         <div className="text-sm text-gray-300">Krishak Bandhu</div>
                         <div className="text-xs text-gray-500">Farmer Beneficiaries</div>
                     </div>
-                    <div className="p-4 rounded-lg bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20">
-                        <div className="text-2xl font-bold text-cyan-400">{formatNumber(westBengalStats.schemes.kanyashree.beneficiaries)}</div>
+                    <div className="p-4 rounded-lg border" style={{ background: 'rgba(13, 148, 136, 0.1)', borderColor: 'rgba(13, 148, 136, 0.25)' }}>
+                        <div className="text-2xl font-bold text-teal-400">{formatNumber(westBengalStats.schemes.kanyashree.beneficiaries)}</div>
                         <div className="text-sm text-gray-300">Kanyashree</div>
                         <div className="text-xs text-gray-500">Girls Enrolled</div>
                     </div>
-                    <div className="p-4 rounded-lg bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+                    <div className="p-4 rounded-lg border" style={{ background: 'rgba(245, 158, 11, 0.1)', borderColor: 'rgba(245, 158, 11, 0.25)' }}>
                         <div className="text-2xl font-bold text-amber-400">{formatNumber(westBengalStats.schemes.bhabishyatCredit.loansDisbursed)}</div>
                         <div className="text-sm text-gray-300">Bhabishyat Credit</div>
                         <div className="text-xs text-gray-500">Loans Disbursed</div>
@@ -245,15 +245,15 @@ export default function AIInsightsPage() {
             <div className="glass-card p-5 mb-6">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="font-semibold flex items-center gap-2">
-                        <span className="w-2 h-2 bg-blue-400 rounded-full" />
+                        <span className="w-2 h-2 bg-teal-400 rounded-full" />
                         Migration Jobs & Salaries by Destination
                     </h2>
                     <span className="text-xs text-gray-500">Based on field surveys & labor reports</span>
                 </div>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {migrationJobsData.slice(0, 4).map(dest => (
-                        <div key={dest.destination} className="p-4 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20">
-                            <div className="text-lg font-bold text-blue-400 mb-3">{dest.destination}</div>
+                        <div key={dest.destination} className="p-4 rounded-xl border" style={{ background: 'rgba(30, 58, 95, 0.15)', borderColor: 'rgba(30, 58, 95, 0.3)' }}>
+                            <div className="text-lg font-bold text-teal-400 mb-3">{dest.destination}</div>
                             <div className="space-y-2">
                                 {dest.jobs.map(job => (
                                     <div key={job.type} className="flex items-center justify-between text-sm">
@@ -261,7 +261,7 @@ export default function AIInsightsPage() {
                                             <span>{job.icon}</span>
                                             <span className="text-gray-300">{job.type}</span>
                                         </div>
-                                        <span className="text-green-400 font-medium text-xs">{job.salaryRange}</span>
+                                        <span className="text-emerald-400 font-medium text-xs">{job.salaryRange}</span>
                                     </div>
                                 ))}
                             </div>
@@ -272,7 +272,7 @@ export default function AIInsightsPage() {
                 <div className="mt-4 grid md:grid-cols-3 gap-4">
                     {migrationJobsData.slice(4).map(dest => (
                         <div key={dest.destination} className="p-3 rounded-lg bg-white/5 border border-white/10">
-                            <div className="text-sm font-semibold text-purple-400 mb-2">{dest.destination}</div>
+                            <div className="text-sm font-semibold text-emerald-400 mb-2">{dest.destination}</div>
                             <div className="space-y-1">
                                 {dest.jobs.slice(0, 3).map(job => (
                                     <div key={job.type} className="flex items-center justify-between text-xs">
@@ -324,16 +324,16 @@ export default function AIInsightsPage() {
 
             {/* Platform Stats */}
             <div className="grid md:grid-cols-2 gap-4 mb-6">
-                <div className="stat-card border-l-4 border-l-purple-500">
+                <div className="stat-card border-l-4 border-l-emerald-500">
                     <div className="text-sm text-gray-400 mb-1">SignalX Platform Jobs</div>
-                    <div className="text-3xl font-bold text-purple-400">
+                    <div className="text-3xl font-bold text-emerald-400">
                         {platformStats.loadingStats ? '...' : platformStats.activeJobs}
                     </div>
                     <div className="text-xs text-gray-500">Active Postings</div>
                 </div>
-                <div className="stat-card border-l-4 border-l-cyan-500">
+                <div className="stat-card border-l-4 border-l-teal-500">
                     <div className="text-sm text-gray-400 mb-1">Registered Employers</div>
-                    <div className="text-3xl font-bold text-cyan-400">
+                    <div className="text-3xl font-bold text-teal-400">
                         {platformStats.loadingStats ? '...' : platformStats.employers}
                     </div>
                     <div className="text-xs text-gray-500">On Platform</div>
@@ -343,7 +343,7 @@ export default function AIInsightsPage() {
             {/* AI Query Section */}
             <div className="glass-card p-6 mb-6">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
                     Ask SignalX AI
@@ -370,10 +370,10 @@ export default function AIInsightsPage() {
             {response && (
                 <div className="glass-card p-6 mb-6">
                     <h3 className="font-semibold mb-4 flex items-center gap-2">
-                        <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                        <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
                         SignalX Analysis
                     </h3>
-                    <div className="prose prose-invert prose-sm max-w-none prose-headings:text-purple-400 prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-p:text-gray-300 prose-p:leading-relaxed prose-strong:text-cyan-400 prose-strong:font-semibold prose-li:text-gray-300 prose-ul:my-2 prose-ol:my-2">
+                    <div className="prose prose-invert prose-sm max-w-none prose-headings:text-emerald-400 prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-p:text-gray-300 prose-p:leading-relaxed prose-strong:text-teal-400 prose-strong:font-semibold prose-li:text-gray-300 prose-ul:my-2 prose-ol:my-2">
                         <ReactMarkdown>{response}</ReactMarkdown>
                     </div>
                 </div>
@@ -394,7 +394,7 @@ export default function AIInsightsPage() {
                         <button
                             key={preset}
                             onClick={() => setQuery(preset)}
-                            className="px-3 py-2 text-sm glass-card hover:border-purple-500/50 transition-all"
+                            className="px-3 py-2 text-sm glass-card hover:border-teal-500/50 transition-all"
                         >
                             {preset}
                         </button>

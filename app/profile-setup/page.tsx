@@ -84,14 +84,14 @@ export default function ProfileSetupPage() {
         <div className="min-h-screen py-12 px-4 relative overflow-hidden">
             {/* Background */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-20 left-10 w-72 h-72 bg-purple-600/20 rounded-full blur-3xl animate-float" />
-                <div className="absolute bottom-20 right-20 w-96 h-96 bg-cyan-500/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+                <div className="absolute top-20 left-10 w-72 h-72 rounded-full blur-3xl animate-float" style={{ background: 'rgba(30, 58, 95, 0.25)' }} />
+                <div className="absolute bottom-20 right-20 w-96 h-96 rounded-full blur-3xl animate-float" style={{ background: 'rgba(13, 148, 136, 0.15)', animationDelay: '1s' }} />
             </div>
 
             <div className="max-w-2xl mx-auto relative z-10">
                 <div className="text-center mb-10">
                     <h1 className="text-4xl font-bold mb-4">
-                        <span className="gradient-text">Complete Your Profile</span>
+                        <span className="text-emerald-500">Complete Your Profile</span>
                     </h1>
                     <p className="text-gray-400">Tell us about yourself to get started</p>
                 </div>
@@ -108,9 +108,9 @@ export default function ProfileSetupPage() {
                         <div className="flex flex-col items-center mb-8">
                             <div className="relative mb-4">
                                 {photoURL ? (
-                                    <img src={photoURL} alt="Profile" className="w-28 h-28 rounded-full object-cover border-4 border-purple-500/30" />
+                                    <img src={photoURL} alt="Profile" className="w-28 h-28 rounded-full object-cover border-4 border-emerald-500/30" />
                                 ) : (
-                                    <div className="w-28 h-28 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
+                                    <div className="w-28 h-28 rounded-full flex items-center justify-center" style={{ background: '#1e3a5f' }}>
                                         <span className="text-4xl font-bold text-white">
                                             {displayName ? displayName[0].toUpperCase() : '?'}
                                         </span>

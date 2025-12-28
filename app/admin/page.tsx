@@ -134,9 +134,9 @@ export default function AdminPage() {
     const tabs = [
         { id: 'pending' as TabType, label: 'Pending Approvals', count: pendingUsers.length, color: 'amber' },
         { id: 'users' as TabType, label: 'Approved Users', count: approvedUsers.length, color: 'green' },
-        { id: 'jobs' as TabType, label: 'Active Jobs', count: activeJobs.length, color: 'cyan' },
-        { id: 'reviews' as TabType, label: 'Job Reviews', count: pendingJobs.length, color: 'pink' },
-        { id: 'ai' as TabType, label: 'AI Insights', count: null, color: 'purple' },
+        { id: 'jobs' as TabType, label: 'Active Jobs', count: activeJobs.length, color: 'teal' },
+        { id: 'reviews' as TabType, label: 'Job Reviews', count: pendingJobs.length, color: 'slate' },
+        { id: 'ai' as TabType, label: 'AI Insights', count: null, color: 'teal' },
         { id: 'alerts' as TabType, label: 'Supply Alerts', count: null, color: 'red' },
     ];
 
@@ -161,10 +161,10 @@ export default function AdminPage() {
             <header className="glass-card rounded-none border-x-0 border-t-0 px-6 py-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-cyan-500 rounded-xl flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#1e3a5f' }}>
                             <span className="text-white font-bold">S</span>
                         </div>
-                        <span className="text-xl font-bold gradient-text">SignalX Admin</span>
+                        <span className="text-xl font-bold text-emerald-500">SignalX Admin</span>
                     </div>
                     <div className="flex items-center gap-4">
                         <span className="text-gray-400 hidden md:block">{user?.email}</span>
@@ -200,28 +200,29 @@ export default function AdminPage() {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex items-center gap-3 px-5 py-3 rounded-xl font-medium transition-all whitespace-nowrap ${activeTab === tab.id
-                                ? 'bg-gradient-to-r from-purple-600/20 to-cyan-500/20 border border-purple-500/30 text-white'
+                                ? 'border text-white'
                                 : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
                                 }`}
+                            style={activeTab === tab.id ? { background: 'rgba(30, 58, 95, 0.3)', borderColor: 'rgba(16, 185, 129, 0.4)' } : {}}
                         >
                             <span className={`w-2 h-2 rounded-full ${tab.color === 'amber' ? 'bg-amber-400' :
-                                tab.color === 'green' ? 'bg-green-400' :
-                                    tab.color === 'purple' ? 'bg-purple-400' :
-                                        tab.color === 'red' ? 'bg-red-400' : 'bg-cyan-400'
+                                tab.color === 'green' ? 'bg-emerald-400' :
+                                    tab.color === 'teal' ? 'bg-teal-400' :
+                                        tab.color === 'red' ? 'bg-red-400' : 'bg-slate-400'
                                 }`} />
                             {tab.label}
                             {tab.count !== null && (
                                 <span className={`px-2 py-0.5 text-sm rounded-full ${tab.color === 'amber' ? 'bg-amber-500/20 text-amber-400' :
-                                    tab.color === 'green' ? 'bg-green-500/20 text-green-400' :
-                                        tab.color === 'purple' ? 'bg-purple-500/20 text-purple-400' :
-                                            tab.color === 'pink' ? 'bg-pink-500/20 text-pink-400' :
-                                                tab.color === 'red' ? 'bg-red-500/20 text-red-400' : 'bg-cyan-500/20 text-cyan-400'
+                                    tab.color === 'green' ? 'bg-emerald-500/20 text-emerald-400' :
+                                        tab.color === 'teal' ? 'bg-teal-500/20 text-teal-400' :
+                                            tab.color === 'slate' ? 'bg-slate-500/20 text-slate-400' :
+                                                tab.color === 'red' ? 'bg-red-500/20 text-red-400' : 'bg-teal-500/20 text-teal-400'
                                     }`}>
                                     {tab.count}
                                 </span>
                             )}
                             {tab.id === 'ai' && (
-                                <span className="px-2 py-0.5 text-xs rounded-full bg-gradient-to-r from-purple-500/20 to-cyan-500/20 text-purple-300">Groq</span>
+                                <span className="px-2 py-0.5 text-xs rounded-full bg-teal-500/20 text-teal-300">Groq</span>
                             )}
                         </button>
                     ))}
@@ -254,7 +255,7 @@ export default function AdminPage() {
                                                         {pendingUser.photoURL ? (
                                                             <img src={pendingUser.photoURL} alt="" className="w-12 h-12 rounded-full object-cover" />
                                                         ) : (
-                                                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
+                                                            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: '#1e3a5f' }}>
                                                                 <span className="text-lg font-bold text-white">
                                                                     {pendingUser.displayName?.[0]?.toUpperCase() || '?'}
                                                                 </span>
@@ -264,7 +265,7 @@ export default function AdminPage() {
                                                             <div className="font-semibold">{pendingUser.displayName || 'No Name'}</div>
                                                             <div className="text-sm text-gray-400">{pendingUser.email}</div>
                                                             {pendingUser.company && (
-                                                                <div className="text-xs text-cyan-400">{pendingUser.company}</div>
+                                                                <div className="text-xs text-teal-400">{pendingUser.company}</div>
                                                             )}
                                                         </div>
                                                     </div>
@@ -298,7 +299,7 @@ export default function AdminPage() {
                                                     {approvedUser.photoURL ? (
                                                         <img src={approvedUser.photoURL} alt="" className="w-10 h-10 rounded-full object-cover" />
                                                     ) : (
-                                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-600 to-cyan-500 flex items-center justify-center">
+                                                        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: '#10b981' }}>
                                                             <span className="text-sm font-bold text-white">
                                                                 {approvedUser.displayName?.[0]?.toUpperCase() || '?'}
                                                             </span>
@@ -333,7 +334,7 @@ export default function AdminPage() {
                                                             <div className="flex items-center gap-2 mb-2 flex-wrap">
                                                                 <h3 className="font-semibold">{job.title}</h3>
                                                                 {job.jobType && (
-                                                                    <span className="px-2 py-0.5 text-xs rounded-full bg-cyan-500/20 text-cyan-400">
+                                                                    <span className="px-2 py-0.5 text-xs rounded-full bg-teal-500/20 text-teal-400">
                                                                         {job.jobType}
                                                                     </span>
                                                                 )}
@@ -347,7 +348,7 @@ export default function AdminPage() {
                                                                 {job.description && job.description.length > 150 && (
                                                                     <button
                                                                         onClick={() => toggleJobExpand(job.id!)}
-                                                                        className="mt-1 text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors"
+                                                                        className="mt-1 text-xs text-teal-400 hover:text-teal-300 flex items-center gap-1 transition-colors"
                                                                     >
                                                                         {expandedJobs.has(job.id!) ? (
                                                                             <>
@@ -395,7 +396,7 @@ export default function AdminPage() {
                                                             {job.skills && job.skills.length > 0 && (
                                                                 <div className="flex flex-wrap gap-1 mt-2">
                                                                     {job.skills.slice(0, 4).map(skill => (
-                                                                        <span key={skill} className="px-2 py-0.5 text-xs rounded-full bg-purple-500/20 text-purple-400">
+                                                                        <span key={skill} className="px-2 py-0.5 text-xs rounded-full" style={{ background: 'rgba(30, 58, 95, 0.4)', color: '#94a3b8' }}>
                                                                             {skill}
                                                                         </span>
                                                                     ))}
@@ -455,13 +456,13 @@ export default function AdminPage() {
                                     ) : (
                                         <div className="space-y-4">
                                             {pendingJobs.map((job) => (
-                                                <div key={job.id} className="glass-card p-6 border-l-4 border-l-pink-500">
+                                                <div key={job.id} className="glass-card p-6 border-l-4 border-l-slate-500">
                                                     <div className="flex items-start justify-between gap-6">
                                                         <div className="flex-1">
                                                             <div className="flex items-center gap-3 mb-2">
                                                                 <h3 className="text-lg font-bold">{job.title}</h3>
                                                                 {job.jobType && (
-                                                                    <span className="px-2 py-0.5 text-xs rounded-full bg-cyan-500/20 text-cyan-400">
+                                                                    <span className="px-2 py-0.5 text-xs rounded-full bg-teal-500/20 text-teal-400">
                                                                         {job.jobType}
                                                                     </span>
                                                                 )}
@@ -474,7 +475,7 @@ export default function AdminPage() {
                                                                 </div>
                                                                 <button
                                                                     onClick={() => toggleJobExpand(job.id!)}
-                                                                    className="mt-2 text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors"
+                                                                    className="mt-2 text-xs text-teal-400 hover:text-teal-300 flex items-center gap-1 transition-colors"
                                                                 >
                                                                     {expandedJobs.has(job.id!) ? (
                                                                         <>
@@ -530,7 +531,8 @@ export default function AdminPage() {
                                                         <div className="flex flex-col gap-2 shrink-0">
                                                             <button
                                                                 onClick={() => job.id && handleJobReview(job.id, 'approve')}
-                                                                className="btn-primary py-2 px-4 shadow-lg shadow-green-500/20 bg-gradient-to-r from-green-600 to-green-500 border-green-500"
+                                                                className="btn-primary py-2 px-4 shadow-lg shadow-emerald-500/20"
+                                                                style={{ background: '#10b981' }}
                                                             >
                                                                 Approve
                                                             </button>
@@ -554,7 +556,7 @@ export default function AdminPage() {
                                 <div>
                                     <div className="flex items-center justify-between mb-6">
                                         <h2 className="text-xl font-semibold">AI Insights & Trends</h2>
-                                        <span className="px-3 py-1 text-xs rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                                        <span className="px-3 py-1 text-xs rounded-full bg-teal-500/20 text-teal-400 border border-teal-500/30">
                                             Powered by Groq Llama3
                                         </span>
                                     </div>
@@ -575,7 +577,7 @@ export default function AdminPage() {
                                         </div>
                                         <div className="p-4 rounded-xl bg-white/5 border border-white/10">
                                             <div className="text-xs text-gray-400 mb-1">Daily Avg Wage</div>
-                                            <div className="text-xl font-bold text-cyan-400">₹{westBengalStats.mgnrega.averageWage}</div>
+                                            <div className="text-xl font-bold text-teal-400">₹{westBengalStats.mgnrega.averageWage}</div>
                                         </div>
                                     </div>
 
@@ -607,13 +609,13 @@ export default function AdminPage() {
                                     </div>
 
                                     {/* AI Query Box */}
-                                    <div className="p-6 rounded-2xl bg-gradient-to-br from-purple-600/10 to-cyan-500/10 border border-purple-500/20 mb-6">
+                                    <div className="p-6 rounded-2xl border mb-6" style={{ background: 'rgba(13, 148, 136, 0.1)', borderColor: 'rgba(13, 148, 136, 0.3)' }}>
                                         <div className="flex gap-4">
                                             <input
                                                 type="text"
                                                 value={aiQuery}
                                                 onChange={(e) => setAiQuery(e.target.value)}
-                                                className="input flex-1 bg-black/20 border-white/10 focus:border-purple-500/50"
+                                                className="input flex-1 bg-black/20 border-white/10 focus:border-teal-500/50"
                                                 placeholder="Ask about migration trends, livelihood gaps, or scheme impact..."
                                                 onKeyDown={(e) => e.key === 'Enter' && handleAiAnalyze()}
                                             />
@@ -637,12 +639,12 @@ export default function AdminPage() {
 
                                     {/* Response Display */}
                                     {aiResponse && (
-                                        <div className="glass-card p-6 border-green-500/20 bg-green-500/5 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                            <div className="flex items-center gap-2 mb-4 text-green-400">
-                                                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                                        <div className="glass-card p-6 border-emerald-500/20 bg-emerald-500/5 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                            <div className="flex items-center gap-2 mb-4 text-emerald-400">
+                                                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
                                                 <span className="text-sm font-semibold">SignalX Analysis Complete</span>
                                             </div>
-                                            <div className="prose prose-invert prose-sm max-w-none prose-headings:text-purple-400 prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-p:text-gray-300 prose-p:leading-relaxed prose-strong:text-cyan-400 prose-strong:font-semibold prose-li:text-gray-300 prose-ul:my-2 prose-ol:my-2">
+                                            <div className="prose prose-invert prose-sm max-w-none prose-headings:text-emerald-400 prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-p:text-gray-300 prose-p:leading-relaxed prose-strong:text-teal-400 prose-strong:font-semibold prose-li:text-gray-300 prose-ul:my-2 prose-ol:my-2">
                                                 <ReactMarkdown>{aiResponse}</ReactMarkdown>
                                             </div>
                                         </div>
@@ -666,7 +668,7 @@ export default function AdminPage() {
                                                         // Auto-trigger analysis for quick queries? 
                                                         // Let's just set the query for now as per dashboard behavior
                                                     }}
-                                                    className="px-4 py-2 text-xs rounded-xl bg-white/5 border border-white/10 hover:border-purple-500/50 hover:bg-white/10 transition-all text-gray-400 hover:text-white"
+                                                    className="px-4 py-2 text-xs rounded-xl bg-white/5 border border-white/10 hover:border-teal-500/50 hover:bg-white/10 transition-all text-gray-400 hover:text-white"
                                                 >
                                                     {preset}
                                                 </button>

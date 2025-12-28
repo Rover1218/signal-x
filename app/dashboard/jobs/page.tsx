@@ -154,7 +154,7 @@ export default function JobsPage() {
                                             {job.status === 'approved' ? 'Active' : job.status === 'rejected' ? 'Rejected' : 'Under Review'}
                                         </span>
                                         {job.jobType && (
-                                            <span className="px-3 py-1 rounded-full text-xs bg-cyan-500/20 text-cyan-400">
+                                            <span className="px-3 py-1 rounded-full text-xs bg-teal-500/20 text-teal-400">
                                                 {job.jobType}
                                             </span>
                                         )}
@@ -165,7 +165,7 @@ export default function JobsPage() {
                                     {job.skills && job.skills.length > 0 && (
                                         <div className="flex flex-wrap gap-2 mb-3">
                                             {job.skills.map(skill => (
-                                                <span key={skill} className="px-2 py-1 text-xs rounded-full bg-purple-500/20 text-purple-400">
+                                                <span key={skill} className="px-2 py-1 text-xs rounded-full" style={{ background: 'rgba(30, 58, 95, 0.3)', color: '#64b5f6' }}>
                                                     {skill}
                                                 </span>
                                             ))}
@@ -205,8 +205,8 @@ export default function JobsPage() {
                                     <Link
                                         href={`/dashboard/jobs/${job.id}/applications`}
                                         className={`relative p-2 rounded-lg transition-all ${(applicationCounts[job.id!] || 0) > 0
-                                                ? 'bg-purple-500/20 text-purple-400 hover:bg-purple-500/30'
-                                                : 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white'
+                                            ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'
+                                            : 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white'
                                             }`}
                                         title="View Applications"
                                     >
@@ -214,7 +214,7 @@ export default function JobsPage() {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                         </svg>
                                         {(applicationCounts[job.id!] || 0) > 0 && (
-                                            <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-purple-500 text-white text-xs flex items-center justify-center font-bold">
+                                            <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-emerald-500 text-white text-xs flex items-center justify-center font-bold">
                                                 {applicationCounts[job.id!]}
                                             </span>
                                         )}

@@ -48,28 +48,28 @@ export default function RedirectPage() {
         <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
             {/* Background */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-900/30 via-transparent to-cyan-900/30" />
-                <div className="absolute top-20 left-10 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-float" />
-                <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-cyan-500/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+                <div className="absolute top-0 left-0 w-full h-full" style={{ background: 'rgba(30, 58, 95, 0.1)' }} />
+                <div className="absolute top-20 left-10 w-96 h-96 rounded-full blur-3xl animate-float" style={{ background: 'rgba(30, 58, 95, 0.25)' }} />
+                <div className="absolute bottom-20 right-20 w-[500px] h-[500px] rounded-full blur-3xl animate-float" style={{ background: 'rgba(13, 148, 136, 0.15)', animationDelay: '1s' }} />
             </div>
 
             <div className="text-center relative z-10">
                 {/* Logo */}
                 <div className="flex items-center gap-4 justify-center mb-8">
-                    <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-cyan-500 rounded-3xl flex items-center justify-center shadow-2xl shadow-purple-500/50 animate-pulse-glow">
+                    <div className="w-20 h-20 rounded-3xl flex items-center justify-center shadow-2xl animate-pulse-glow" style={{ background: '#1e3a5f', boxShadow: '0 12px 40px rgba(30, 58, 95, 0.5)' }}>
                         <span className="text-white font-bold text-4xl">S</span>
                     </div>
                 </div>
 
-                <h1 className="text-4xl font-bold gradient-text mb-4">SignalX</h1>
+                <h1 className="text-4xl font-bold text-emerald-500 mb-4">SignalX</h1>
 
                 {/* Custom Loader */}
                 <div className="flex justify-center mb-6">
                     <div className="flex gap-2">
-                        <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <div className="w-3 h-3 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                        <div className="w-3 h-3 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: '450ms' }} />
+                        <div className="w-3 h-3 rounded-full animate-bounce" style={{ background: '#1e3a5f', animationDelay: '0ms' }} />
+                        <div className="w-3 h-3 rounded-full animate-bounce" style={{ background: '#0d9488', animationDelay: '150ms' }} />
+                        <div className="w-3 h-3 rounded-full animate-bounce" style={{ background: '#10b981', animationDelay: '300ms' }} />
+                        <div className="w-3 h-3 rounded-full animate-bounce" style={{ background: '#0d9488', animationDelay: '450ms' }} />
                     </div>
                 </div>
 

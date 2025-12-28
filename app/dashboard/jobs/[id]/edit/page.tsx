@@ -187,7 +187,7 @@ export default function EditJobPage() {
                     {/* Skills Selection */}
                     <div className="glass-card p-6">
                         <h3 className="font-semibold mb-2 flex items-center gap-2">
-                            <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                             </svg>
                             Target Skills *
@@ -200,9 +200,10 @@ export default function EditJobPage() {
                                     type="button"
                                     onClick={() => toggleSkill(skill)}
                                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedSkills.includes(skill)
-                                            ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white shadow-lg'
-                                            : 'bg-white/5 text-gray-400 border border-white/10 hover:border-purple-500/50'
+                                        ? 'text-white shadow-lg'
+                                        : 'bg-white/5 text-gray-400 border border-white/10 hover:border-emerald-500/50'
                                         }`}
+                                    style={selectedSkills.includes(skill) ? { background: '#1e3a5f', boxShadow: '0 8px 16px rgba(30, 58, 95, 0.3)' } : {}}
                                 >
                                     {skill}
                                     {selectedSkills.includes(skill) && <span className="ml-2">✓</span>}
@@ -214,7 +215,7 @@ export default function EditJobPage() {
                     {/* Job Type Selection */}
                     <div className="glass-card p-6">
                         <h3 className="font-semibold mb-2 flex items-center gap-2">
-                            <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
                             Job Type *
@@ -226,9 +227,10 @@ export default function EditJobPage() {
                                     type="button"
                                     onClick={() => setJobType(type)}
                                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${jobType === type
-                                            ? 'bg-gradient-to-r from-cyan-500 to-green-500 text-white shadow-lg'
-                                            : 'bg-white/5 text-gray-400 border border-white/10 hover:border-cyan-500/50'
+                                        ? 'text-white shadow-lg'
+                                        : 'bg-white/5 text-gray-400 border border-white/10 hover:border-teal-500/50'
                                         }`}
+                                    style={jobType === type ? { background: '#10b981', boxShadow: '0 8px 16px rgba(16, 185, 129, 0.3)' } : {}}
                                 >
                                     {type}
                                     {jobType === type && <span className="ml-2">✓</span>}

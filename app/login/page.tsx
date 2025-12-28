@@ -44,19 +44,19 @@ export default function LoginPage() {
         <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-8">
             {/* Enhanced Background */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-900/20 via-transparent to-cyan-900/20" />
-                <div className="absolute top-20 left-10 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-float" />
-                <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-cyan-500/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-purple-600/10 to-cyan-600/10 rounded-full blur-3xl" />
+                <div className="absolute top-0 left-0 w-full h-full" style={{ background: 'rgba(30, 58, 95, 0.1)' }} />
+                <div className="absolute top-20 left-10 w-96 h-96 rounded-full blur-3xl animate-float" style={{ background: 'rgba(30, 58, 95, 0.25)' }} />
+                <div className="absolute bottom-20 right-20 w-[500px] h-[500px] rounded-full blur-3xl animate-float" style={{ background: 'rgba(13, 148, 136, 0.15)', animationDelay: '1s' }} />
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl" style={{ background: 'rgba(16, 185, 129, 0.08)' }} />
             </div>
 
             <div className="glass-card p-8 sm:p-10 md:p-12 w-full max-w-md lg:max-w-lg relative z-10 backdrop-blur-xl">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-3 justify-center mb-8 sm:mb-10 group">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-600 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/50 group-hover:shadow-purple-500/70 transition-all group-hover:scale-110">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-all" style={{ background: '#1e3a5f', boxShadow: '0 8px 24px rgba(30, 58, 95, 0.5)' }}>
                         <span className="text-white font-bold text-2xl sm:text-3xl">S</span>
                     </div>
-                    <span className="text-3xl sm:text-4xl font-bold gradient-text">SignalX</span>
+                    <span className="text-3xl sm:text-4xl font-bold text-emerald-500">SignalX</span>
                 </Link>
 
                 <div className="text-center mb-8 sm:mb-10">
@@ -114,7 +114,7 @@ export default function LoginPage() {
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
+                                className="text-xs text-emerald-500 hover:text-emerald-400 transition-colors"
                             >
                                 {showPassword ? 'Hide' : 'Show'}
                             </button>
@@ -133,7 +133,8 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="btn-primary w-full justify-center mt-7 py-4 text-base font-semibold hover:scale-105 transition-all shadow-xl shadow-purple-600/30"
+                        className="btn-primary w-full justify-center mt-7 py-4 text-base font-semibold hover:scale-105 transition-all shadow-xl"
+                        style={{ boxShadow: '0 8px 24px rgba(30, 58, 95, 0.4)' }}
                     >
                         {loading ? (
                             <div className="flex items-center gap-2">
@@ -148,7 +149,7 @@ export default function LoginPage() {
 
                 <p className="text-center text-gray-400 mt-8 text-sm sm:text-base">
                     Don't have an account?{' '}
-                    <Link href="/signup" className="text-purple-400 hover:text-purple-300 font-semibold transition-colors underline decoration-purple-400/30 hover:decoration-purple-300">
+                    <Link href="/signup" className="text-emerald-500 hover:text-emerald-400 font-semibold transition-colors underline decoration-emerald-500/30 hover:decoration-emerald-400">
                         Create one now
                     </Link>
                 </p>

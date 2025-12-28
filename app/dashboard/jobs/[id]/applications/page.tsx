@@ -88,7 +88,7 @@ export default function JobApplicationsPage() {
     if (loading) {
         return (
             <div className="flex justify-center items-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
             </div>
         );
     }
@@ -109,7 +109,7 @@ export default function JobApplicationsPage() {
                 <div className="flex items-end justify-between">
                     <div>
                         <h1 className="text-4xl font-bold mb-2">
-                            Applications for <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{jobTitle || 'Job'}</span>
+                            Applications for <span className="text-emerald-500">{jobTitle || 'Job'}</span>
                         </h1>
                         <p className="text-gray-400 text-lg">Manage candidates and view profiles</p>
                     </div>
@@ -122,8 +122,8 @@ export default function JobApplicationsPage() {
 
             {applications.length === 0 ? (
                 <div className="glass-card p-16 text-center border-dashed border-2 border-white/10">
-                    <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                        <svg className="w-12 h-12 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ background: 'rgba(30, 58, 95, 0.3)' }}>
+                        <svg className="w-12 h-12 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                     </div>
@@ -143,10 +143,11 @@ export default function JobApplicationsPage() {
                                         <img
                                             src={app.workerProfile.photoURL}
                                             alt={app.workerProfile.fullName}
-                                            className="w-20 h-20 rounded-2xl object-cover border-2 border-purple-500/50 shadow-lg shadow-purple-500/20"
+                                            className="w-20 h-20 rounded-2xl object-cover border-2 border-emerald-500/50 shadow-lg"
+                                            style={{ boxShadow: '0 8px 24px rgba(16, 185, 129, 0.2)' }}
                                         />
                                     ) : (
-                                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-purple-500/20">
+                                        <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-lg" style={{ background: '#1e3a5f', boxShadow: '0 8px 24px rgba(30, 58, 95, 0.3)' }}>
                                             {app.workerProfile?.fullName?.[0]?.toUpperCase() || 'W'}
                                         </div>
                                     )}
@@ -176,7 +177,7 @@ export default function JobApplicationsPage() {
                                         {app.workerProfile?.skills && app.workerProfile.skills.length > 0 && (
                                             <div className="flex flex-wrap gap-2">
                                                 {app.workerProfile.skills.map(skill => (
-                                                    <span key={skill} className="px-2.5 py-1 bg-purple-500/10 text-purple-300 border border-purple-500/20 rounded-lg text-xs font-medium">
+                                                    <span key={skill} className="px-2.5 py-1 rounded-lg text-xs font-medium" style={{ background: 'rgba(30, 58, 95, 0.25)', color: '#64b5f6', border: '1px solid rgba(30, 58, 95, 0.4)' }}>
                                                         {skill}
                                                     </span>
                                                 ))}
