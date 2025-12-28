@@ -5,7 +5,66 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signUpWithEmail, signInWithGoogle } from '../lib/firebase';
 
+const translations = {
+    en: {
+        createAccount: 'Create Account',
+        joinSubtitle: 'Join SignalX and make an impact in West Bengal',
+        continueWithGoogle: 'Continue with Google',
+        creatingAccount: 'Creating account...',
+        or: 'or',
+        emailAddress: 'Email Address',
+        password: 'Password',
+        confirmPassword: 'Confirm Password',
+        show: 'Show',
+        hide: 'Hide',
+        strengthWeak: 'Weak',
+        strengthMedium: 'Medium',
+        strengthStrong: 'Strong',
+        strength: 'Strength',
+        passwordsDontMatch: "Passwords don't match",
+        agreeToTerms: 'I agree to the',
+        termsOfService: 'Terms of Service',
+        and: 'and',
+        privacyPolicy: 'Privacy Policy',
+        createAccountBtn: 'Create Account',
+        alreadyHaveAccount: 'Already have an account?',
+        signIn: 'Sign in',
+        pleaseAgreeTerms: 'Please agree to the terms and conditions',
+        passwordsDontMatchError: 'Passwords do not match',
+        passwordMinLength: 'Password must be at least 6 characters',
+    },
+    bn: {
+        createAccount: 'অ্যাকাউন্ট তৈরি করুন',
+        joinSubtitle: 'SignalX-এ যোগ দিন এবং পশ্চিমবঙ্গে প্রভাব ফেলুন',
+        continueWithGoogle: 'Google দিয়ে চালিয়ে যান',
+        creatingAccount: 'অ্যাকাউন্ট তৈরি হচ্ছে...',
+        or: 'অথবা',
+        emailAddress: 'ইমেইল ঠিকানা',
+        password: 'পাসওয়ার্ড',
+        confirmPassword: 'পাসওয়ার্ড নিশ্চিত করুন',
+        show: 'দেখুন',
+        hide: 'লুকান',
+        strengthWeak: 'দুর্বল',
+        strengthMedium: 'মাঝারি',
+        strengthStrong: 'শক্তিশালী',
+        strength: 'শক্তি',
+        passwordsDontMatch: 'পাসওয়ার্ড মিলছে না',
+        agreeToTerms: 'আমি সম্মত',
+        termsOfService: 'সেবার শর্তাবলী',
+        and: 'এবং',
+        privacyPolicy: 'গোপনীয়তা নীতি',
+        createAccountBtn: 'অ্যাকাউন্ট তৈরি করুন',
+        alreadyHaveAccount: 'ইতিমধ্যে একটি অ্যাকাউন্ট আছে?',
+        signIn: 'সাইন ইন',
+        pleaseAgreeTerms: 'অনুগ্রহ করে শর্তাবলীতে সম্মত হন',
+        passwordsDontMatchError: 'পাসওয়ার্ড মিলছে না',
+        passwordMinLength: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে',
+    }
+};
+
 export default function SignupPage() {
+    const [lang, setLang] = useState<'en' | 'bn'>('en');
+    const t = translations[lang];
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -17,7 +76,7 @@ export default function SignupPage() {
 
     const handleGoogleSignIn = async () => {
         if (!agreedToTerms) {
-            setError('Please agree to the terms and conditions');
+            setError(t.pleaseAgreeTerms);
             return;
         }
         setLoading(true);
@@ -34,15 +93,15 @@ export default function SignupPage() {
     const handleEmailSignUp = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!agreedToTerms) {
-            setError('Please agree to the terms and conditions');
+            setError(t.pleaseAgreeTerms);
             return;
         }
         if (password !== confirmPassword) {
-            setError('Passwords do not match');
+            setError(t.passwordsDontMatchError);
             return;
         }
         if (password.length < 6) {
-            setError('Password must be at least 6 characters');
+            setError(t.passwordMinLength);
             return;
         }
 
@@ -59,9 +118,9 @@ export default function SignupPage() {
 
     const passwordStrength = () => {
         if (password.length === 0) return { label: '', color: '' };
-        if (password.length < 6) return { label: 'Weak', color: 'text-red-500' };
-        if (password.length < 10) return { label: 'Medium', color: 'text-yellow-500' };
-        return { label: 'Strong', color: 'text-green-500' };
+        if (password.length < 6) return { label: t.strengthWeak, color: 'text-red-500' };
+        if (password.length < 10) return { label: t.strengthMedium, color: 'text-yellow-500' };
+        return { label: t.strengthStrong, color: 'text-green-500' };
     };
 
     const strength = passwordStrength();
@@ -76,6 +135,23 @@ export default function SignupPage() {
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl" style={{ background: 'rgba(16, 185, 129, 0.08)' }} />
             </div>
 
+            {/* Language Toggle - Top Right */}
+            <button
+                onClick={() => setLang(lang === 'en' ? 'bn' : 'en')}
+                className="absolute top-4 right-4 z-20 flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 hover:scale-105"
+                style={{
+                    background: 'rgba(30, 58, 95, 0.3)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(30, 58, 95, 0.4)',
+                    boxShadow: '0 4px 16px rgba(30, 58, 95, 0.15)',
+                }}
+            >
+                <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                </svg>
+                <span className="text-white">{lang === 'en' ? 'বাংলা' : 'English'}</span>
+            </button>
+
             <div className="glass-card p-8 sm:p-10 md:p-12 w-full max-w-md lg:max-w-lg relative z-10 backdrop-blur-xl">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-3 justify-center mb-8 sm:mb-10 group">
@@ -86,8 +162,8 @@ export default function SignupPage() {
                 </Link>
 
                 <div className="text-center mb-8 sm:mb-10">
-                    <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-white">Create Account</h1>
-                    <p className="text-gray-400 text-sm sm:text-base">Join SignalX and make an impact in West Bengal</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-white">{t.createAccount}</h1>
+                    <p className="text-gray-400 text-sm sm:text-base">{t.joinSubtitle}</p>
                 </div>
 
                 {error && (
@@ -111,19 +187,19 @@ export default function SignupPage() {
                         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                     </svg>
-                    {loading ? 'Creating account...' : 'Continue with Google'}
+                    {loading ? t.creatingAccount : t.continueWithGoogle}
                 </button>
 
                 <div className="flex items-center gap-4 mb-6">
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-                    <span className="text-gray-500 text-sm font-medium">or</span>
+                    <span className="text-gray-500 text-sm font-medium">{t.or}</span>
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
                 </div>
 
                 {/* Email Form */}
                 <form onSubmit={handleEmailSignUp} className="space-y-5">
                     <div>
-                        <label className="block text-sm font-semibold text-gray-300 mb-2.5">Email Address</label>
+                        <label className="block text-sm font-semibold text-gray-300 mb-2.5">{t.emailAddress}</label>
                         <input
                             type="email"
                             value={email}
@@ -136,13 +212,13 @@ export default function SignupPage() {
                     </div>
                     <div>
                         <div className="flex items-center justify-between mb-2.5">
-                            <label className="block text-sm font-semibold text-gray-300">Password</label>
+                            <label className="block text-sm font-semibold text-gray-300">{t.password}</label>
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="text-xs text-emerald-500 hover:text-emerald-400 transition-colors"
                             >
-                                {showPassword ? 'Hide' : 'Show'}
+                                {showPassword ? t.hide : t.show}
                             </button>
                         </div>
                         <input
@@ -156,12 +232,12 @@ export default function SignupPage() {
                         />
                         {password && (
                             <p className={`text-xs mt-2 ${strength.color} font-medium`}>
-                                Strength: {strength.label}
+                                {t.strength}: {strength.label}
                             </p>
                         )}
                     </div>
                     <div>
-                        <label className="block text-sm font-semibold text-gray-300 mb-2.5">Confirm Password</label>
+                        <label className="block text-sm font-semibold text-gray-300 mb-2.5">{t.confirmPassword}</label>
                         <input
                             type={showPassword ? 'text' : 'password'}
                             value={confirmPassword}
@@ -173,7 +249,7 @@ export default function SignupPage() {
                         />
                         {confirmPassword && password !== confirmPassword && (
                             <p className="text-xs mt-2 text-red-500 font-medium">
-                                Passwords don't match
+                                {t.passwordsDontMatch}
                             </p>
                         )}
                     </div>
@@ -188,10 +264,10 @@ export default function SignupPage() {
                             className="mt-1 w-4 h-4 rounded border-gray-600 bg-gray-700 text-emerald-600 focus:ring-emerald-500 focus:ring-2 cursor-pointer"
                         />
                         <label htmlFor="terms" className="text-xs sm:text-sm text-gray-400 cursor-pointer">
-                            I agree to the{' '}
-                            <a href="#" className="text-emerald-500 hover:text-emerald-400 underline">Terms of Service</a>
-                            {' '}and{' '}
-                            <a href="#" className="text-emerald-500 hover:text-emerald-400 underline">Privacy Policy</a>
+                            {t.agreeToTerms}{' '}
+                            <a href="#" className="text-emerald-500 hover:text-emerald-400 underline">{t.termsOfService}</a>
+                            {' '}{t.and}{' '}
+                            <a href="#" className="text-emerald-500 hover:text-emerald-400 underline">{t.privacyPolicy}</a>
                         </label>
                     </div>
 
@@ -204,18 +280,18 @@ export default function SignupPage() {
                         {loading ? (
                             <div className="flex items-center gap-2">
                                 <div className="spinner w-5 h-5" />
-                                <span>Creating account...</span>
+                                <span>{t.creatingAccount}</span>
                             </div>
                         ) : (
-                            'Create Account'
+                            t.createAccountBtn
                         )}
                     </button>
                 </form>
 
                 <p className="text-center text-gray-400 mt-8 text-sm sm:text-base">
-                    Already have an account?{' '}
+                    {t.alreadyHaveAccount}{' '}
                     <Link href="/login" className="text-emerald-500 hover:text-emerald-400 font-semibold transition-colors underline decoration-emerald-500/30 hover:decoration-emerald-400">
-                        Sign in
+                        {t.signIn}
                     </Link>
                 </p>
             </div>

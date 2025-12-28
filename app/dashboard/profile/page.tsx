@@ -3,8 +3,45 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../components/AuthProvider';
 import { updateUserProfile } from '../../lib/db';
+import { useDashboardLang } from '../DashboardLangContext';
+
+// Page-specific translations
+const pageTranslations = {
+    en: {
+        profile: 'Profile',
+        manageAccount: 'Manage your account information',
+        profileUpdated: 'Profile updated successfully!',
+        changePhoto: 'Change Photo',
+        fullName: 'Full Name',
+        email: 'Email',
+        company: 'Company',
+        phone: 'Phone',
+        location: 'Location',
+        bio: 'Bio',
+        saveChanges: 'Save Changes',
+        cloudinaryNotConfigured: 'Cloudinary not configured',
+        failedToUpload: 'Failed to upload image',
+    },
+    bn: {
+        profile: 'প্রোফাইল',
+        manageAccount: 'আপনার অ্যাকাউন্ট তথ্য পরিচালনা করুন',
+        profileUpdated: 'প্রোফাইল সফলভাবে আপডেট হয়েছে!',
+        changePhoto: 'ছবি পরিবর্তন করুন',
+        fullName: 'পুরো নাম',
+        email: 'ইমেইল',
+        company: 'কোম্পানি',
+        phone: 'ফোন',
+        location: 'অবস্থান',
+        bio: 'জীবনী',
+        saveChanges: 'পরিবর্তন সংরক্ষণ করুন',
+        cloudinaryNotConfigured: 'Cloudinary কনফিগার করা হয়নি',
+        failedToUpload: 'ছবি আপলোড করতে ব্যর্থ',
+    }
+};
 
 export default function ProfilePage() {
+    const { lang } = useDashboardLang();
+    const t = pageTranslations[lang];
     const { user, profile, refreshProfile } = useAuth();
     const [displayName, setDisplayName] = useState('');
     const [company, setCompany] = useState('');
@@ -56,8 +93,8 @@ export default function ProfilePage() {
     return (
         <div className="max-w-3xl">
             <div className="mb-10">
-                <h1 className="text-3xl font-bold mb-2">Profile</h1>
-                <p className="text-gray-400">Manage your account information</p>
+                <h1 className="text-3xl font-bold mb-2">{t.profile}</h1>
+                <p className="text-gray-400">{t.manageAccount}</p>
             </div>
 
             <div className="glass-card p-8">
@@ -66,7 +103,7 @@ export default function ProfilePage() {
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
-                        Profile updated successfully!
+                        {t.profileUpdated}
                     </div>
                 )}
 
@@ -94,7 +131,7 @@ export default function ProfilePage() {
                                     const cloudinaryUrl = process.env.NEXT_PUBLIC_CLOUDINARY_URL || '';
                                     const match = cloudinaryUrl.match(/cloudinary:\/\/(\d+):([^@]+)@(.+)/);
                                     if (!match) {
-                                        setUploadError('Cloudinary not configured');
+                                        setUploadError(t.cloudinaryNotConfigured);
                                         return;
                                     }
                                     const cloudName = match[3];
@@ -113,14 +150,14 @@ export default function ProfilePage() {
                                             setPhotoURL(data.secure_url);
                                         }
                                     } catch (err) {
-                                        setUploadError('Failed to upload image');
+                                        setUploadError(t.failedToUpload);
                                     }
                                 }}
                                 className="hidden"
                                 id="profile-photo-upload"
                             />
                             <label htmlFor="profile-photo-upload" className="btn-secondary text-sm py-2 px-4 cursor-pointer">
-                                Change Photo
+                                {t.changePhoto}
                             </label>
                             {uploadError && <p className="text-red-400 text-xs mt-2">{uploadError}</p>}
                         </div>
@@ -128,7 +165,7 @@ export default function ProfilePage() {
 
                     <div className="grid md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">{t.fullName}</label>
                             <input
                                 type="text"
                                 value={displayName}
@@ -137,7 +174,7 @@ export default function ProfilePage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">{t.email}</label>
                             <input
                                 type="email"
                                 value={profile?.email || ''}
@@ -146,7 +183,7 @@ export default function ProfilePage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Company</label>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">{t.company}</label>
                             <input
                                 type="text"
                                 value={company}
@@ -155,7 +192,7 @@ export default function ProfilePage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Phone</label>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">{t.phone}</label>
                             <input
                                 type="tel"
                                 value={phone}
@@ -166,7 +203,7 @@ export default function ProfilePage() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Location</label>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">{t.location}</label>
                         <input
                             type="text"
                             value={location}
@@ -176,7 +213,7 @@ export default function ProfilePage() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Bio</label>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">{t.bio}</label>
                         <textarea
                             value={bio}
                             onChange={(e) => setBio(e.target.value)}
@@ -185,7 +222,7 @@ export default function ProfilePage() {
                     </div>
 
                     <button type="submit" disabled={saving} className="btn-primary">
-                        {saving ? <div className="spinner w-5 h-5" /> : 'Save Changes'}
+                        {saving ? <div className="spinner w-5 h-5" /> : t.saveChanges}
                     </button>
                 </form>
             </div>

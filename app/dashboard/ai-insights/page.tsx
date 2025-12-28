@@ -5,8 +5,111 @@ import ReactMarkdown from 'react-markdown';
 import { analyzeLivelihood } from '../../lib/gemini';
 import { getAllJobs, getApprovedUsers, Job, UserProfile } from '../../lib/db';
 import { westBengalStats, districtRiskScores, highRiskBlocks, migrationJobsData, sourceDistrictData } from '../../lib/wb-stats';
+import { useDashboardLang } from '../DashboardLangContext';
+
+// Page-specific translations
+const pageTranslations = {
+    en: {
+        aiInsights: 'AI Insights',
+        poweredByGroq: 'Powered by Groq AI • Data from Official Sources',
+        updated: 'Updated',
+        refreshStats: 'Refresh Stats',
+        wbMgnregaStats: 'West Bengal MGNREGA Statistics',
+        source: 'Source',
+        jobCards: 'Job Cards',
+        activeWorkers: 'Active Workers',
+        personDaysGenerated: 'Person-Days Generated',
+        dailyWage: 'Daily Wage',
+        womenWorkers: 'Women Workers',
+        stateSchemeCoverage: 'State Scheme Coverage',
+        womenBeneficiaries: 'Women Beneficiaries',
+        farmerBeneficiaries: 'Farmer Beneficiaries',
+        girlsEnrolled: 'Girls Enrolled',
+        loansDisbursed: 'Loans Disbursed',
+        migrationRiskAnalysis: 'Migration Risk Analysis',
+        seasonalMigrants: 'seasonal migrants',
+        highRisk: 'High-Risk',
+        mediumRisk: 'Medium-Risk',
+        stable: 'Stable',
+        more: 'more',
+        topMigrationDestinations: 'Top Migration Destinations',
+        highRiskBlocks: 'High-Risk Blocks (Priority Intervention)',
+        migrationJobsSalaries: 'Migration Jobs & Salaries by Destination',
+        basedOnFieldSurveys: 'Based on field surveys & labor reports',
+        sourceDistricts: 'Source Districts - Migration Patterns',
+        district: 'District',
+        migrantPop: 'Migrant Pop.',
+        topJobs: 'Top Jobs',
+        signalxPlatformJobs: 'SignalX Platform Jobs',
+        activePostings: 'Active Postings',
+        registeredEmployers: 'Registered Employers',
+        onPlatform: 'On Platform',
+        askSignalxAi: 'Ask SignalX AI',
+        askPlaceholder: 'e.g. What are the livelihood gaps in Purulia district?',
+        analyze: 'Analyze',
+        signalxAnalysis: 'SignalX Analysis',
+        quickQueries: 'Quick Queries',
+        dataSources: 'Data Sources & Reliability',
+        official: 'Official',
+        verifiedGovSources: 'Verified Government Sources',
+        estimated: 'Estimated',
+        researchBasedApprox: 'Research-Based Approximations',
+        dataPeriod: 'Data Period: FY 2023-24 • Last Updated: December 2024',
+        forRealTimeData: 'For real-time data, visit official portals directly',
+    },
+    bn: {
+        aiInsights: 'AI অন্তর্দৃষ্টি',
+        poweredByGroq: 'Groq AI দ্বারা চালিত • সরকারি সূত্র থেকে তথ্য',
+        updated: 'আপডেট হয়েছে',
+        refreshStats: 'রিফ্রেশ করুন',
+        wbMgnregaStats: 'পশ্চিমবঙ্গ MGNREGA পরিসংখ্যান',
+        source: 'সূত্র',
+        jobCards: 'জব কার্ড',
+        activeWorkers: 'সক্রিয় শ্রমিক',
+        personDaysGenerated: 'ব্যক্তি-দিবস সৃষ্টি',
+        dailyWage: 'দৈনিক মজুরি',
+        womenWorkers: 'মহিলা শ্রমিক',
+        stateSchemeCoverage: 'রাজ্য প্রকল্প কভারেজ',
+        womenBeneficiaries: 'মহিলা সুবিধাভোগী',
+        farmerBeneficiaries: 'কৃষক সুবিধাভোগী',
+        girlsEnrolled: 'নথিভুক্ত মেয়ে',
+        loansDisbursed: 'বিতরিত ঋণ',
+        migrationRiskAnalysis: 'অভিবাসন ঝুঁকি বিশ্লেষণ',
+        seasonalMigrants: 'মৌসুমী অভিবাসী',
+        highRisk: 'উচ্চ-ঝুঁকি',
+        mediumRisk: 'মাঝারি-ঝুঁকি',
+        stable: 'স্থিতিশীল',
+        more: 'আরও',
+        topMigrationDestinations: 'শীর্ষ অভিবাসন গন্তব্য',
+        highRiskBlocks: 'উচ্চ-ঝুঁকি ব্লক (অগ্রাধিকার হস্তক্ষেপ)',
+        migrationJobsSalaries: 'গন্তব্য অনুযায়ী অভিবাসন চাকরি ও বেতন',
+        basedOnFieldSurveys: 'ক্ষেত্র জরিপ ও শ্রম প্রতিবেদনের উপর ভিত্তি করে',
+        sourceDistricts: 'উৎস জেলা - অভিবাসন প্যাটার্ন',
+        district: 'জেলা',
+        migrantPop: 'অভিবাসী জনসংখ্যা',
+        topJobs: 'শীর্ষ চাকরি',
+        signalxPlatformJobs: 'SignalX প্ল্যাটফর্ম চাকরি',
+        activePostings: 'সক্রিয় পোস্টিং',
+        registeredEmployers: 'নিবন্ধিত নিয়োগকর্তা',
+        onPlatform: 'প্ল্যাটফর্মে',
+        askSignalxAi: 'SignalX AI কে জিজ্ঞাসা করুন',
+        askPlaceholder: 'যেমন: পুরুলিয়া জেলায় জীবিকার ফাঁক কী?',
+        analyze: 'বিশ্লেষণ',
+        signalxAnalysis: 'SignalX বিশ্লেষণ',
+        quickQueries: 'দ্রুত প্রশ্ন',
+        dataSources: 'তথ্য উৎস ও নির্ভরযোগ্যতা',
+        official: 'সরকারি',
+        verifiedGovSources: 'যাচাইকৃত সরকারি উৎস',
+        estimated: 'আনুমানিক',
+        researchBasedApprox: 'গবেষণা-ভিত্তিক আনুমানিক',
+        dataPeriod: 'তথ্য সময়কাল: FY ২০২৩-২৪ • সর্বশেষ আপডেট: ডিসেম্বর ২০২৪',
+        forRealTimeData: 'রিয়েল-টাইম তথ্যের জন্য, সরাসরি সরকারি পোর্টাল দেখুন',
+    }
+};
 
 export default function AIInsightsPage() {
+    const { lang } = useDashboardLang();
+    const t = pageTranslations[lang];
     const [query, setQuery] = useState('');
     const [response, setResponse] = useState('');
     const [loading, setLoading] = useState(false);
@@ -72,20 +175,20 @@ export default function AIInsightsPage() {
         <div>
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold mb-2">AI Insights</h1>
-                    <p className="text-gray-400">Powered by Groq AI • Data from Official Sources</p>
+                    <h1 className="text-3xl font-bold mb-2">{t.aiInsights}</h1>
+                    <p className="text-gray-400">{t.poweredByGroq}</p>
                 </div>
                 <div className="flex items-center gap-3">
                     {lastUpdated && (
                         <span className="text-xs text-gray-500">
-                            Updated: {lastUpdated.toLocaleTimeString()}
+                            {t.updated}: {lastUpdated.toLocaleTimeString()}
                         </span>
                     )}
                     <button
                         onClick={refreshStats}
                         disabled={statsLoading}
                         className="p-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all disabled:opacity-50"
-                        title="Refresh Stats"
+                        title={t.refreshStats}
                     >
                         <svg className={`w-5 h-5 ${statsLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -99,30 +202,30 @@ export default function AIInsightsPage() {
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="font-semibold flex items-center gap-2">
                         <span className="w-2 h-2 bg-green-400 rounded-full" />
-                        West Bengal MGNREGA Statistics
+                        {t.wbMgnregaStats}
                     </h2>
-                    <span className="text-xs text-gray-500">Source: nrega.nic.in</span>
+                    <span className="text-xs text-gray-500">{t.source}: nrega.nic.in</span>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                     <div className="text-center p-3 rounded-lg bg-white/5">
                         <div className="text-2xl font-bold text-green-400">{formatNumber(westBengalStats.mgnrega.totalJobCards)}</div>
-                        <div className="text-xs text-gray-400">Job Cards</div>
+                        <div className="text-xs text-gray-400">{t.jobCards}</div>
                     </div>
                     <div className="text-center p-3 rounded-lg bg-white/5">
                         <div className="text-2xl font-bold text-teal-400">{formatNumber(westBengalStats.mgnrega.activeWorkers)}</div>
-                        <div className="text-xs text-gray-400">Active Workers</div>
+                        <div className="text-xs text-gray-400">{t.activeWorkers}</div>
                     </div>
                     <div className="text-center p-3 rounded-lg bg-white/5">
                         <div className="text-2xl font-bold text-teal-400">{westBengalStats.mgnrega.personDaysGenerated} L</div>
-                        <div className="text-xs text-gray-400">Person-Days Generated</div>
+                        <div className="text-xs text-gray-400">{t.personDaysGenerated}</div>
                     </div>
                     <div className="text-center p-3 rounded-lg bg-white/5">
                         <div className="text-2xl font-bold text-amber-400">₹{westBengalStats.mgnrega.averageWage}</div>
-                        <div className="text-xs text-gray-400">Daily Wage</div>
+                        <div className="text-xs text-gray-400">{t.dailyWage}</div>
                     </div>
                     <div className="text-center p-3 rounded-lg bg-white/5">
                         <div className="text-2xl font-bold text-pink-400">{westBengalStats.mgnrega.womenParticipation}%</div>
-                        <div className="text-xs text-gray-400">Women Workers</div>
+                        <div className="text-xs text-gray-400">{t.womenWorkers}</div>
                     </div>
                 </div>
             </div>
@@ -132,30 +235,30 @@ export default function AIInsightsPage() {
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="font-semibold flex items-center gap-2">
                         <span className="w-2 h-2 bg-teal-400 rounded-full" />
-                        State Scheme Coverage
+                        {t.stateSchemeCoverage}
                     </h2>
-                    <span className="text-xs text-gray-500">Source: wb.gov.in</span>
+                    <span className="text-xs text-gray-500">{t.source}: wb.gov.in</span>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="p-4 rounded-lg border" style={{ background: 'rgba(30, 58, 95, 0.15)', borderColor: 'rgba(30, 58, 95, 0.3)' }}>
                         <div className="text-2xl font-bold text-teal-400">{formatNumber(westBengalStats.schemes.lakshirBhandar.beneficiaries)}</div>
                         <div className="text-sm text-gray-300">Lakshmir Bhandar</div>
-                        <div className="text-xs text-gray-500">Women Beneficiaries</div>
+                        <div className="text-xs text-gray-500">{t.womenBeneficiaries}</div>
                     </div>
                     <div className="p-4 rounded-lg border" style={{ background: 'rgba(16, 185, 129, 0.1)', borderColor: 'rgba(16, 185, 129, 0.25)' }}>
                         <div className="text-2xl font-bold text-emerald-400">{formatNumber(westBengalStats.schemes.krishakBandhu.beneficiaries)}</div>
                         <div className="text-sm text-gray-300">Krishak Bandhu</div>
-                        <div className="text-xs text-gray-500">Farmer Beneficiaries</div>
+                        <div className="text-xs text-gray-500">{t.farmerBeneficiaries}</div>
                     </div>
                     <div className="p-4 rounded-lg border" style={{ background: 'rgba(13, 148, 136, 0.1)', borderColor: 'rgba(13, 148, 136, 0.25)' }}>
                         <div className="text-2xl font-bold text-teal-400">{formatNumber(westBengalStats.schemes.kanyashree.beneficiaries)}</div>
                         <div className="text-sm text-gray-300">Kanyashree</div>
-                        <div className="text-xs text-gray-500">Girls Enrolled</div>
+                        <div className="text-xs text-gray-500">{t.girlsEnrolled}</div>
                     </div>
                     <div className="p-4 rounded-lg border" style={{ background: 'rgba(245, 158, 11, 0.1)', borderColor: 'rgba(245, 158, 11, 0.25)' }}>
                         <div className="text-2xl font-bold text-amber-400">{formatNumber(westBengalStats.schemes.bhabishyatCredit.loansDisbursed)}</div>
                         <div className="text-sm text-gray-300">Bhabishyat Credit</div>
-                        <div className="text-xs text-gray-500">Loans Disbursed</div>
+                        <div className="text-xs text-gray-500">{t.loansDisbursed}</div>
                     </div>
                 </div>
             </div>
@@ -165,13 +268,13 @@ export default function AIInsightsPage() {
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="font-semibold flex items-center gap-2">
                         <span className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
-                        Migration Risk Analysis
+                        {t.migrationRiskAnalysis}
                     </h2>
-                    <span className="text-xs text-gray-500">~{westBengalStats.migration.estimatedMigrants}L seasonal migrants</span>
+                    <span className="text-xs text-gray-500">~{westBengalStats.migration.estimatedMigrants}L {t.seasonalMigrants}</span>
                 </div>
                 <div className="grid md:grid-cols-3 gap-4 mb-4">
                     <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                        <div className="text-lg font-bold text-red-400 mb-2">{westBengalStats.migration.highRiskDistricts.length} High-Risk</div>
+                        <div className="text-lg font-bold text-red-400 mb-2">{westBengalStats.migration.highRiskDistricts.length} {t.highRisk}</div>
                         <div className="space-y-1">
                             {westBengalStats.migration.highRiskDistricts.map(d => (
                                 <div key={d} className="text-xs text-gray-400 flex items-center gap-2">
@@ -182,7 +285,7 @@ export default function AIInsightsPage() {
                         </div>
                     </div>
                     <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                        <div className="text-lg font-bold text-amber-400 mb-2">{westBengalStats.migration.mediumRiskDistricts.length} Medium-Risk</div>
+                        <div className="text-lg font-bold text-amber-400 mb-2">{westBengalStats.migration.mediumRiskDistricts.length} {t.mediumRisk}</div>
                         <div className="space-y-1">
                             {westBengalStats.migration.mediumRiskDistricts.map(d => (
                                 <div key={d} className="text-xs text-gray-400 flex items-center gap-2">
@@ -193,7 +296,7 @@ export default function AIInsightsPage() {
                         </div>
                     </div>
                     <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                        <div className="text-lg font-bold text-green-400 mb-2">{westBengalStats.migration.stableDistricts.length} Stable</div>
+                        <div className="text-lg font-bold text-green-400 mb-2">{westBengalStats.migration.stableDistricts.length} {t.stable}</div>
                         <div className="space-y-1">
                             {westBengalStats.migration.stableDistricts.slice(0, 5).map(d => (
                                 <div key={d} className="text-xs text-gray-400 flex items-center gap-2">
@@ -202,13 +305,13 @@ export default function AIInsightsPage() {
                                 </div>
                             ))}
                             {westBengalStats.migration.stableDistricts.length > 5 && (
-                                <div className="text-xs text-gray-500">+{westBengalStats.migration.stableDistricts.length - 5} more</div>
+                                <div className="text-xs text-gray-500">+{westBengalStats.migration.stableDistricts.length - 5} {t.more}</div>
                             )}
                         </div>
                     </div>
                 </div>
                 <div className="p-3 rounded-lg bg-white/5">
-                    <div className="text-xs text-gray-400 mb-2">Top Migration Destinations:</div>
+                    <div className="text-xs text-gray-400 mb-2">{t.topMigrationDestinations}:</div>
                     <div className="flex flex-wrap gap-2">
                         {westBengalStats.migration.topDestinations.map(dest => (
                             <span key={dest} className="px-3 py-1 text-xs rounded-full bg-blue-500/20 text-blue-400">
@@ -223,7 +326,7 @@ export default function AIInsightsPage() {
             <div className="glass-card p-5 mb-6">
                 <h2 className="font-semibold mb-4 flex items-center gap-2">
                     <span className="w-2 h-2 bg-orange-400 rounded-full" />
-                    High-Risk Blocks (Priority Intervention)
+                    {t.highRiskBlocks}
                 </h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {highRiskBlocks.map(item => (
@@ -246,9 +349,9 @@ export default function AIInsightsPage() {
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="font-semibold flex items-center gap-2">
                         <span className="w-2 h-2 bg-teal-400 rounded-full" />
-                        Migration Jobs & Salaries by Destination
+                        {t.migrationJobsSalaries}
                     </h2>
-                    <span className="text-xs text-gray-500">Based on field surveys & labor reports</span>
+                    <span className="text-xs text-gray-500">{t.basedOnFieldSurveys}</span>
                 </div>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {migrationJobsData.slice(0, 4).map(dest => (
@@ -290,15 +393,15 @@ export default function AIInsightsPage() {
             <div className="glass-card p-5 mb-6">
                 <h2 className="font-semibold mb-4 flex items-center gap-2">
                     <span className="w-2 h-2 bg-rose-400 rounded-full" />
-                    Source Districts - Migration Patterns
+                    {t.sourceDistricts}
                 </h2>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="text-left border-b border-white/10">
-                                <th className="pb-3 text-gray-400 font-medium">District</th>
-                                <th className="pb-3 text-gray-400 font-medium">Migrant Pop.</th>
-                                <th className="pb-3 text-gray-400 font-medium">Top Jobs</th>
+                                <th className="pb-3 text-gray-400 font-medium">{t.district}</th>
+                                <th className="pb-3 text-gray-400 font-medium">{t.migrantPop}</th>
+                                <th className="pb-3 text-gray-400 font-medium">{t.topJobs}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -325,18 +428,18 @@ export default function AIInsightsPage() {
             {/* Platform Stats */}
             <div className="grid md:grid-cols-2 gap-4 mb-6">
                 <div className="stat-card border-l-4 border-l-emerald-500">
-                    <div className="text-sm text-gray-400 mb-1">SignalX Platform Jobs</div>
+                    <div className="text-sm text-gray-400 mb-1">{t.signalxPlatformJobs}</div>
                     <div className="text-3xl font-bold text-emerald-400">
                         {platformStats.loadingStats ? '...' : platformStats.activeJobs}
                     </div>
-                    <div className="text-xs text-gray-500">Active Postings</div>
+                    <div className="text-xs text-gray-500">{t.activePostings}</div>
                 </div>
                 <div className="stat-card border-l-4 border-l-teal-500">
-                    <div className="text-sm text-gray-400 mb-1">Registered Employers</div>
+                    <div className="text-sm text-gray-400 mb-1">{t.registeredEmployers}</div>
                     <div className="text-3xl font-bold text-teal-400">
                         {platformStats.loadingStats ? '...' : platformStats.employers}
                     </div>
-                    <div className="text-xs text-gray-500">On Platform</div>
+                    <div className="text-xs text-gray-500">{t.onPlatform}</div>
                 </div>
             </div>
 
@@ -346,7 +449,7 @@ export default function AIInsightsPage() {
                     <svg className="w-6 h-6 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
-                    Ask SignalX AI
+                    {t.askSignalxAi}
                 </h2>
                 <div className="flex gap-4">
                     <input
@@ -354,11 +457,11 @@ export default function AIInsightsPage() {
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         className="input flex-1"
-                        placeholder="e.g. What are the livelihood gaps in Purulia district?"
+                        placeholder={t.askPlaceholder}
                         onKeyDown={(e) => e.key === 'Enter' && handleAnalyze()}
                     />
                     <button onClick={handleAnalyze} disabled={loading} className="btn-primary">
-                        {loading ? <div className="spinner w-5 h-5" /> : 'Analyze'}
+                        {loading ? <div className="spinner w-5 h-5" /> : t.analyze}
                     </button>
                 </div>
                 {error && (
@@ -371,7 +474,7 @@ export default function AIInsightsPage() {
                 <div className="glass-card p-6 mb-6">
                     <h3 className="font-semibold mb-4 flex items-center gap-2">
                         <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                        SignalX Analysis
+                        {t.signalxAnalysis}
                     </h3>
                     <div className="prose prose-invert prose-sm max-w-none prose-headings:text-emerald-400 prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-p:text-gray-300 prose-p:leading-relaxed prose-strong:text-teal-400 prose-strong:font-semibold prose-li:text-gray-300 prose-ul:my-2 prose-ol:my-2">
                         <ReactMarkdown>{response}</ReactMarkdown>
@@ -381,7 +484,7 @@ export default function AIInsightsPage() {
 
             {/* Quick Queries */}
             <div className="glass-card p-6">
-                <h3 className="font-semibold mb-4">Quick Queries</h3>
+                <h3 className="font-semibold mb-4">{t.quickQueries}</h3>
                 <div className="flex flex-wrap gap-2">
                     {[
                         'Migration patterns in Sundarbans',
@@ -408,15 +511,15 @@ export default function AIInsightsPage() {
                     <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    Data Sources & Reliability
+                    {t.dataSources}
                 </h3>
 
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
                     {/* Official Sources */}
                     <div className="p-4 rounded-lg bg-green-500/5 border border-green-500/20">
                         <div className="flex items-center gap-2 mb-3">
-                            <span className="px-2 py-0.5 text-xs rounded-full bg-green-500/20 text-green-400 font-medium">✓ Official</span>
-                            <span className="text-xs text-gray-500">Verified Government Sources</span>
+                            <span className="px-2 py-0.5 text-xs rounded-full bg-green-500/20 text-green-400 font-medium">✓ {t.official}</span>
+                            <span className="text-xs text-gray-500">{t.verifiedGovSources}</span>
                         </div>
                         <div className="space-y-2 text-sm">
                             <a href="https://nrega.nic.in" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-300 hover:text-green-400 transition-colors">
@@ -445,8 +548,8 @@ export default function AIInsightsPage() {
                     {/* Estimated Sources */}
                     <div className="p-4 rounded-lg bg-amber-500/5 border border-amber-500/20">
                         <div className="flex items-center gap-2 mb-3">
-                            <span className="px-2 py-0.5 text-xs rounded-full bg-amber-500/20 text-amber-400 font-medium">⚠ Estimated</span>
-                            <span className="text-xs text-gray-500">Research-Based Approximations</span>
+                            <span className="px-2 py-0.5 text-xs rounded-full bg-amber-500/20 text-amber-400 font-medium">⚠ {t.estimated}</span>
+                            <span className="text-xs text-gray-500">{t.researchBasedApprox}</span>
                         </div>
                         <div className="space-y-2 text-sm text-gray-400">
                             <div className="flex items-center gap-2">
@@ -470,8 +573,8 @@ export default function AIInsightsPage() {
                 </div>
 
                 <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-white/5">
-                    <span>📅 Data Period: FY 2023-24 • Last Updated: December 2024</span>
-                    <span>For real-time data, visit official portals directly</span>
+                    <span>📅 {t.dataPeriod}</span>
+                    <span>{t.forRealTimeData}</span>
                 </div>
             </div>
         </div>

@@ -5,21 +5,97 @@ import { useAuth } from '../components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { getUserJobs, Job } from '../lib/db';
 import Link from 'next/link';
+import { useDashboardLang } from './DashboardLangContext';
+import { getLocalizedName } from '../lib/transliterate';
+
+// Page-specific translations
+const pageTranslations = {
+    en: {
+        goodMorning: 'Good morning',
+        goodAfternoon: 'Good afternoon',
+        goodEvening: 'Good evening',
+        welcomeBack: 'Welcome back',
+        overviewSubtitle: "Here's an overview of your job postings and activity.",
+        all: 'All',
+        totalJobs: 'Total Jobs',
+        live: 'Live',
+        activeJobs: 'Active Jobs',
+        pending: 'Pending',
+        scheduled: 'Scheduled',
+        draft: 'Draft',
+        drafts: 'Drafts',
+        quickActions: 'Quick Actions',
+        postNewJob: 'Post New Job',
+        createNewJobPosting: 'Create a new job posting',
+        manageJobs: 'Manage Jobs',
+        viewAndEditPostings: 'View and edit postings',
+        aiInsightsAction: 'AI Insights',
+        westBengalAnalytics: 'West Bengal analytics',
+        recentJobs: 'Recent Jobs',
+        viewAll: 'View All',
+        noJobsPostedYet: 'No jobs posted yet',
+        startByCreatingFirst: 'Start by creating your first job posting',
+        postYourFirstJob: 'Post Your First Job',
+        signalxAiInsights: 'SignalX AI Insights',
+        analyzeWithGroq: 'Analyze West Bengal livelihood data with Groq AI',
+        exploreInsights: 'Explore Insights →',
+        liveStatus: 'Live',
+        scheduledStatus: 'Scheduled',
+        draftStatus: 'Draft',
+    },
+    bn: {
+        goodMorning: 'সুপ্রভাত',
+        goodAfternoon: 'শুভ অপরাহ্ন',
+        goodEvening: 'শুভ সন্ধ্যা',
+        welcomeBack: 'স্বাগতম',
+        overviewSubtitle: 'আপনার চাকরির পোস্টিং এবং কার্যকলাপের একটি সংক্ষিপ্ত বিবরণ।',
+        all: 'সব',
+        totalJobs: 'মোট চাকরি',
+        live: 'সক্রিয়',
+        activeJobs: 'সক্রিয় চাকরি',
+        pending: 'বিচারাধীন',
+        scheduled: 'নির্ধারিত',
+        draft: 'খসড়া',
+        drafts: 'খসড়াসমূহ',
+        quickActions: 'দ্রুত কাজ',
+        postNewJob: 'নতুন চাকরি পোস্ট করুন',
+        createNewJobPosting: 'একটি নতুন চাকরির পোস্টিং তৈরি করুন',
+        manageJobs: 'চাকরি পরিচালনা',
+        viewAndEditPostings: 'পোস্টিং দেখুন এবং সম্পাদনা করুন',
+        aiInsightsAction: 'AI অন্তর্দৃষ্টি',
+        westBengalAnalytics: 'পশ্চিমবঙ্গ বিশ্লেষণ',
+        recentJobs: 'সাম্প্রতিক চাকরি',
+        viewAll: 'সব দেখুন',
+        noJobsPostedYet: 'এখনো কোনো চাকরি পোস্ট করা হয়নি',
+        startByCreatingFirst: 'আপনার প্রথম চাকরির পোস্টিং তৈরি করে শুরু করুন',
+        postYourFirstJob: 'আপনার প্রথম চাকরি পোস্ট করুন',
+        signalxAiInsights: 'SignalX AI অন্তর্দৃষ্টি',
+        analyzeWithGroq: 'Groq AI দিয়ে পশ্চিমবঙ্গ জীবিকা তথ্য বিশ্লেষণ করুন',
+        exploreInsights: 'অন্তর্দৃষ্টি অন্বেষণ করুন →',
+        liveStatus: 'সক্রিয়',
+        scheduledStatus: 'নির্ধারিত',
+        draftStatus: 'খসড়া',
+    }
+};
 
 export default function DashboardPage() {
     const { profile, loading } = useAuth();
     const router = useRouter();
     const [jobs, setJobs] = useState<Job[]>([]);
     const [loadingJobs, setLoadingJobs] = useState(true);
-    const [greeting, setGreeting] = useState('Welcome back');
 
-    // Set greeting based on time
-    useEffect(() => {
+    // Get language from context
+    const { lang } = useDashboardLang();
+    const t = pageTranslations[lang];
+
+    // Set greeting based on time and language
+    const getGreeting = () => {
         const hour = new Date().getHours();
-        if (hour < 12) setGreeting('Good morning');
-        else if (hour < 17) setGreeting('Good afternoon');
-        else setGreeting('Good evening');
-    }, []);
+        if (hour < 12) return t.goodMorning;
+        if (hour < 17) return t.goodAfternoon;
+        return t.goodEvening;
+    };
+    const greeting = getGreeting();
 
     // Redirect admins to admin dashboard
     useEffect(() => {
@@ -100,13 +176,13 @@ export default function DashboardPage() {
                         )}
                         <div>
                             <h1 className="text-3xl font-bold mb-1 text-white">
-                                {greeting}, <span className="text-emerald-400">{profile?.displayName?.split(' ')[0]}</span>!
+                                {greeting}, <span className="text-emerald-400">{getLocalizedName(profile?.displayName?.split(' ')[0] || '', lang)}</span>!
                             </h1>
                             <p className="text-white/60">{profile?.company || profile?.email}</p>
                         </div>
                     </div>
                     <p className="text-white/70 text-lg">
-                        Here's an overview of your job postings and activity.
+                        {t.overviewSubtitle}
                     </p>
                 </div>
             </div>
@@ -133,10 +209,10 @@ export default function DashboardPage() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
                         </div>
-                        <span className="text-xs text-white/40 group-hover:text-white/70 transition-colors">All</span>
+                        <span className="text-xs text-white/40 group-hover:text-white/70 transition-colors">{t.all}</span>
                     </div>
                     <div className="text-4xl font-bold text-white mb-1">{jobs.length}</div>
-                    <div className="text-sm text-white/50">Total Jobs</div>
+                    <div className="text-sm text-white/50">{t.totalJobs}</div>
                 </div>
 
                 {/* Active Jobs */}
@@ -159,10 +235,10 @@ export default function DashboardPage() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <span className="text-xs text-white/40 group-hover:text-emerald-400 transition-colors">Live</span>
+                        <span className="text-xs text-white/40 group-hover:text-emerald-400 transition-colors">{t.live}</span>
                     </div>
                     <div className="text-4xl font-bold text-emerald-400 mb-1">{activeJobs}</div>
-                    <div className="text-sm text-white/50">Active Jobs</div>
+                    <div className="text-sm text-white/50">{t.activeJobs}</div>
                 </div>
 
                 {/* Scheduled */}
@@ -185,10 +261,10 @@ export default function DashboardPage() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <span className="text-xs text-white/40 group-hover:text-amber-400 transition-colors">Pending</span>
+                        <span className="text-xs text-white/40 group-hover:text-amber-400 transition-colors">{t.pending}</span>
                     </div>
                     <div className="text-4xl font-bold text-amber-400 mb-1">{scheduledJobs}</div>
-                    <div className="text-sm text-white/50">Scheduled</div>
+                    <div className="text-sm text-white/50">{t.scheduled}</div>
                 </div>
 
                 {/* Drafts */}
@@ -211,10 +287,10 @@ export default function DashboardPage() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                         </div>
-                        <span className="text-xs text-white/40 group-hover:text-slate-400 transition-colors">Draft</span>
+                        <span className="text-xs text-white/40 group-hover:text-slate-400 transition-colors">{t.draft}</span>
                     </div>
                     <div className="text-4xl font-bold text-slate-400 mb-1">{draftJobs}</div>
-                    <div className="text-sm text-white/50">Drafts</div>
+                    <div className="text-sm text-white/50">{t.drafts}</div>
                 </div>
             </div>
 
@@ -222,7 +298,7 @@ export default function DashboardPage() {
             <div className="grid lg:grid-cols-3 gap-6 mb-8">
                 {/* Quick Actions - Left Side */}
                 <div className="lg:col-span-1 space-y-4">
-                    <h2 className="text-lg font-semibold text-white/80 mb-4">Quick Actions</h2>
+                    <h2 className="text-lg font-semibold text-white/80 mb-4">{t.quickActions}</h2>
 
                     <Link
                         href="/dashboard/jobs/new"
@@ -242,8 +318,8 @@ export default function DashboardPage() {
                                 </svg>
                             </div>
                             <div>
-                                <div className="font-semibold text-white">Post New Job</div>
-                                <div className="text-xs text-white/70">Create a new job posting</div>
+                                <div className="font-semibold text-white">{t.postNewJob}</div>
+                                <div className="text-xs text-white/70">{t.createNewJobPosting}</div>
                             </div>
                         </div>
                     </Link>
@@ -268,8 +344,8 @@ export default function DashboardPage() {
                                 </svg>
                             </div>
                             <div>
-                                <div className="font-semibold text-white">Manage Jobs</div>
-                                <div className="text-xs text-white/50">View and edit postings</div>
+                                <div className="font-semibold text-white">{t.manageJobs}</div>
+                                <div className="text-xs text-white/50">{t.viewAndEditPostings}</div>
                             </div>
                         </div>
                     </Link>
@@ -294,8 +370,8 @@ export default function DashboardPage() {
                                 </svg>
                             </div>
                             <div>
-                                <div className="font-semibold text-white">AI Insights</div>
-                                <div className="text-xs text-white/50">West Bengal analytics</div>
+                                <div className="font-semibold text-white">{t.aiInsightsAction}</div>
+                                <div className="text-xs text-white/50">{t.westBengalAnalytics}</div>
                             </div>
                         </div>
                     </Link>
@@ -304,9 +380,9 @@ export default function DashboardPage() {
                 {/* Recent Jobs - Right Side */}
                 <div className="lg:col-span-2">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-semibold text-white/80">Recent Jobs</h2>
+                        <h2 className="text-lg font-semibold text-white/80">{t.recentJobs}</h2>
                         <Link href="/dashboard/jobs" className="text-sm text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition-colors">
-                            View All
+                            {t.viewAll}
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                             </svg>
@@ -336,8 +412,8 @@ export default function DashboardPage() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                     </svg>
                                 </div>
-                                <h3 className="text-lg font-semibold mb-2 text-white">No jobs posted yet</h3>
-                                <p className="text-white/50 text-sm mb-4">Start by creating your first job posting</p>
+                                <h3 className="text-lg font-semibold mb-2 text-white">{t.noJobsPostedYet}</h3>
+                                <p className="text-white/50 text-sm mb-4">{t.startByCreatingFirst}</p>
                                 <Link
                                     href="/dashboard/jobs/new"
                                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-white transition-all hover:scale-105"
@@ -349,7 +425,7 @@ export default function DashboardPage() {
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                     </svg>
-                                    Post Your First Job
+                                    {t.postYourFirstJob}
                                 </Link>
                             </div>
                         ) : (
@@ -395,7 +471,7 @@ export default function DashboardPage() {
                                                     color: job.isPublic ? '#10b981' : job.scheduledAt ? '#f59e0b' : '#94a3b8',
                                                 }}
                                             >
-                                                {job.isPublic ? 'Live' : job.scheduledAt ? 'Scheduled' : 'Draft'}
+                                                {job.isPublic ? t.liveStatus : job.scheduledAt ? t.scheduledStatus : t.draftStatus}
                                             </span>
                                             <svg className="w-4 h-4 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -430,8 +506,8 @@ export default function DashboardPage() {
                             </svg>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-lg text-white">SignalX AI Insights</h3>
-                            <p className="text-white/50 text-sm">Analyze West Bengal livelihood data with Groq AI</p>
+                            <h3 className="font-semibold text-lg text-white">{t.signalxAiInsights}</h3>
+                            <p className="text-white/50 text-sm">{t.analyzeWithGroq}</p>
                         </div>
                     </div>
                     <Link
@@ -443,7 +519,7 @@ export default function DashboardPage() {
                             border: '1px solid rgba(255, 255, 255, 0.15)',
                         }}
                     >
-                        Explore Insights →
+                        {t.exploreInsights}
                     </Link>
                 </div>
             </div>

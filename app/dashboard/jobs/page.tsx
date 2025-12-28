@@ -5,9 +5,66 @@ import Link from 'next/link';
 import { useAuth } from '../../components/AuthProvider';
 import { getUserJobs, updateJob, deleteJob, Job, getJobApplicationCount } from '../../lib/db';
 import { Timestamp } from 'firebase/firestore';
+import { useDashboardLang } from '../DashboardLangContext';
+
+// Page-specific translations
+const pageTranslations = {
+    en: {
+        jobs: 'Jobs',
+        manageJobPostings: 'Manage your job postings',
+        refreshJobs: 'Refresh Jobs',
+        postNewJob: 'Post New Job',
+        noJobsYet: 'No Jobs Yet',
+        startByPosting: 'Start by posting your first job opportunity',
+        createYourFirstJob: 'Create Your First Job',
+        active: 'Active',
+        rejected: 'Rejected',
+        underReview: 'Under Review',
+        editJob: 'Edit Job',
+        schedulePublication: 'Schedule Publication',
+        deleteJob: 'Delete Job',
+        viewApplications: 'View Applications',
+        waitForApproval: 'Wait for approval',
+        selectDateAndTime: 'Select both date and time to schedule publication',
+        date: 'Date',
+        time: 'Time',
+        saveSchedule: 'Save Schedule',
+        clearSchedule: 'Clear Schedule',
+        cancel: 'Cancel',
+        confirmDelete: 'Are you sure you want to delete this job?',
+        yesDelete: 'Yes, Delete',
+    },
+    bn: {
+        jobs: 'চাকরি',
+        manageJobPostings: 'আপনার চাকরির পোস্টিং পরিচালনা করুন',
+        refreshJobs: 'রিফ্রেশ করুন',
+        postNewJob: 'নতুন চাকরি পোস্ট করুন',
+        noJobsYet: 'এখনো কোনো চাকরি নেই',
+        startByPosting: 'আপনার প্রথম চাকরির সুযোগ পোস্ট করে শুরু করুন',
+        createYourFirstJob: 'আপনার প্রথম চাকরি তৈরি করুন',
+        active: 'সক্রিয়',
+        rejected: 'প্রত্যাখ্যাত',
+        underReview: 'পর্যালোচনাধীন',
+        editJob: 'চাকরি সম্পাদনা',
+        schedulePublication: 'প্রকাশনা নির্ধারণ',
+        deleteJob: 'চাকরি মুছুন',
+        viewApplications: 'আবেদন দেখুন',
+        waitForApproval: 'অনুমোদনের জন্য অপেক্ষা করুন',
+        selectDateAndTime: 'প্রকাশনা নির্ধারণ করতে তারিখ এবং সময় উভয় নির্বাচন করুন',
+        date: 'তারিখ',
+        time: 'সময়',
+        saveSchedule: 'সময়সূচী সংরক্ষণ',
+        clearSchedule: 'সময়সূচী মুছুন',
+        cancel: 'বাতিল',
+        confirmDelete: 'আপনি কি নিশ্চিত যে আপনি এই চাকরি মুছতে চান?',
+        yesDelete: 'হ্যাঁ, মুছুন',
+    }
+};
 
 export default function JobsPage() {
     const { profile } = useAuth();
+    const { lang } = useDashboardLang();
+    const t = pageTranslations[lang];
     const [jobs, setJobs] = useState<Job[]>([]);
     const [loading, setLoading] = useState(true);
     const [editingSchedule, setEditingSchedule] = useState<string | null>(null);
@@ -101,15 +158,15 @@ export default function JobsPage() {
         <div>
             <div className="flex items-center justify-between mb-10">
                 <div>
-                    <h1 className="text-3xl font-bold mb-2">Jobs</h1>
-                    <p className="text-gray-400">Manage your job postings</p>
+                    <h1 className="text-3xl font-bold mb-2">{t.jobs}</h1>
+                    <p className="text-gray-400">{t.manageJobPostings}</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
                         onClick={refreshJobs}
                         disabled={loading}
                         className="p-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all disabled:opacity-50"
-                        title="Refresh Jobs"
+                        title={t.refreshJobs}
                     >
                         <svg className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -119,7 +176,7 @@ export default function JobsPage() {
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
-                        Post New Job
+                        {t.postNewJob}
                     </Link>
                 </div>
             </div>
@@ -133,9 +190,9 @@ export default function JobsPage() {
                     <svg className="w-20 h-20 mx-auto mb-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    <h2 className="text-xl font-semibold mb-2">No Jobs Yet</h2>
-                    <p className="text-gray-400 mb-6">Start by posting your first job opportunity</p>
-                    <Link href="/dashboard/jobs/new" className="btn-primary">Create Your First Job</Link>
+                    <h2 className="text-xl font-semibold mb-2">{t.noJobsYet}</h2>
+                    <p className="text-gray-400 mb-6">{t.startByPosting}</p>
+                    <Link href="/dashboard/jobs/new" className="btn-primary">{t.createYourFirstJob}</Link>
                 </div>
             ) : (
                 <div className="grid gap-6">
@@ -151,7 +208,7 @@ export default function JobsPage() {
                                                 ? 'bg-red-500/20 text-red-400 border-red-500/30'
                                                 : 'bg-amber-500/20 text-amber-400 border-amber-500/30'
                                             }`}>
-                                            {job.status === 'approved' ? 'Active' : job.status === 'rejected' ? 'Rejected' : 'Under Review'}
+                                            {job.status === 'approved' ? t.active : job.status === 'rejected' ? t.rejected : t.underReview}
                                         </span>
                                         {job.jobType && (
                                             <span className="px-3 py-1 rounded-full text-xs bg-teal-500/20 text-teal-400">
@@ -224,7 +281,7 @@ export default function JobsPage() {
                                     <Link
                                         href={`/dashboard/jobs/${job.id}/edit`}
                                         className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all"
-                                        title="Edit Job"
+                                        title={t.editJob}
                                     >
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -235,7 +292,7 @@ export default function JobsPage() {
                                     <button
                                         onClick={() => setEditingSchedule(editingSchedule === job.id ? null : job.id!)}
                                         className={`p-2 rounded-lg transition-all ${editingSchedule === job.id ? 'bg-amber-500/20 text-amber-400' : 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white'}`}
-                                        title="Schedule Publication"
+                                        title={t.schedulePublication}
                                     >
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -246,7 +303,7 @@ export default function JobsPage() {
                                     <button
                                         onClick={() => setDeleteConfirm(job.id!)}
                                         className="p-2 rounded-lg bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-all"
-                                        title="Delete Job"
+                                        title={t.deleteJob}
                                     >
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -262,7 +319,7 @@ export default function JobsPage() {
                                         />
                                         {job.status !== 'approved' && (
                                             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs bg-black/80 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                                                Wait for approval
+                                                {t.waitForApproval}
                                             </div>
                                         )}
                                     </div>
@@ -272,10 +329,10 @@ export default function JobsPage() {
                             {/* Schedule Editor */}
                             {editingSchedule === job.id && (
                                 <div className="mt-4 pt-4 border-t border-white/10">
-                                    <p className="text-sm text-gray-400 mb-3">Select both date and time to schedule publication</p>
+                                    <p className="text-sm text-gray-400 mb-3">{t.selectDateAndTime}</p>
                                     <div className="flex flex-wrap items-end gap-4">
                                         <div>
-                                            <label className="block text-sm text-gray-400 mb-1">Date <span className="text-red-400">*</span></label>
+                                            <label className="block text-sm text-gray-400 mb-1">{t.date} <span className="text-red-400">*</span></label>
                                             <input
                                                 type="date"
                                                 value={scheduleDate}
@@ -284,7 +341,7 @@ export default function JobsPage() {
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm text-gray-400 mb-1">Time <span className="text-red-400">*</span></label>
+                                            <label className="block text-sm text-gray-400 mb-1">{t.time} <span className="text-red-400">*</span></label>
                                             <input
                                                 type="time"
                                                 value={scheduleTime}
@@ -297,21 +354,21 @@ export default function JobsPage() {
                                             disabled={!scheduleDate || !scheduleTime}
                                             className="btn-primary py-2 px-4 disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            Save Schedule
+                                            {t.saveSchedule}
                                         </button>
                                         {job.scheduledAt && (
                                             <button
                                                 onClick={() => handleClearSchedule(job.id!)}
                                                 className="btn-secondary py-2 px-4 text-red-400 border-red-500/30 hover:bg-red-500/10"
                                             >
-                                                Clear Schedule
+                                                {t.clearSchedule}
                                             </button>
                                         )}
                                         <button
                                             onClick={() => setEditingSchedule(null)}
                                             className="btn-secondary py-2 px-4"
                                         >
-                                            Cancel
+                                            {t.cancel}
                                         </button>
                                     </div>
                                 </div>
@@ -321,18 +378,18 @@ export default function JobsPage() {
                             {deleteConfirm === job.id && (
                                 <div className="mt-4 pt-4 border-t border-white/10">
                                     <div className="flex items-center gap-4">
-                                        <span className="text-red-400">Are you sure you want to delete this job?</span>
+                                        <span className="text-red-400">{t.confirmDelete}</span>
                                         <button
                                             onClick={() => handleDelete(job.id!)}
                                             className="btn-secondary py-2 px-4 text-red-400 border-red-500/30 hover:bg-red-500/10"
                                         >
-                                            Yes, Delete
+                                            {t.yesDelete}
                                         </button>
                                         <button
                                             onClick={() => setDeleteConfirm(null)}
                                             className="btn-secondary py-2 px-4"
                                         >
-                                            Cancel
+                                            {t.cancel}
                                         </button>
                                     </div>
                                 </div>
