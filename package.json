@@ -12,14 +12,17 @@
     "@google/generative-ai": "^0.24.1",
     "@react-email/components": "^1.0.2",
     "@types/nodemailer": "^7.0.4",
+    "clsx": "^2.1.1",
     "firebase": "^12.7.0",
+    "framer-motion": "^12.23.26",
     "next": "^14.2.35",
     "next-cloudinary": "^6.17.5",
     "nodemailer": "^7.0.12",
     "react": "18.2.0",
     "react-dom": "^18.2.0",
     "react-email": "^5.1.0",
-    "react-markdown": "^10.1.0"
+    "react-markdown": "^10.1.0",
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
     "@types/node": "^20",
