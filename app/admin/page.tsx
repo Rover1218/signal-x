@@ -720,7 +720,23 @@ export default function AdminPage() {
                                                             headers: { 'Content-Type': 'application/json' },
                                                             body: JSON.stringify({ reports: validReports }),
                                                         });
-                                                        alert(`Analysis complete. Sent 1 summary email for ${validReports.length} districts.`);
+                                                        // Show custom success toast instead of browser alert
+                                                        const toast = document.createElement('div');
+                                                        toast.className = 'fixed bottom-5 right-5 bg-green-600 text-white px-6 py-4 rounded-lg shadow-xl z-50 flex items-center animate-bounce';
+                                                        toast.innerHTML = `
+                                                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                            <div>
+                                                                <h4 class="font-bold">Analysis Complete! 🚀</h4>
+                                                                <p class="text-sm">Sent 1 summary email for ${validReports.length} districts.</p>
+                                                            </div>
+                                                        `;
+                                                        document.body.appendChild(toast);
+                                                        setTimeout(() => {
+                                                            toast.style.opacity = '0';
+                                                            toast.style.transition = 'opacity 0.5s';
+                                                            setTimeout(() => document.body.removeChild(toast), 500);
+                                                        }, 5000);
+
                                                     } catch (e) {
                                                         console.error('Failed to send bulk email', e);
                                                         alert('Analysis complete, but failed to send summary email.');
